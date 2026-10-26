@@ -1,0 +1,11 @@
+Read-only diagnostics; no driver download/install, cleanup or uninstall executed.
+Installed entries: 101
+Driver records: 153
+DISPLAY driver records: 1
+Deep scan findings: 0
+AutoCAD approved product states:
+{28B89EEF-8155-0409-0100-CF3F3A09B77D} = -1
+{28B89EEF-8101-0409-2102-CF3F3A09B77D} = -1
+{28B89EEF-8101-0000-3102-CF3F3A09B77D} = -1
+Shared Autodesk MSI state: 5
+GPU: NVIDIA GeForce GTX 1650 SUPER | 32.0.15.9144

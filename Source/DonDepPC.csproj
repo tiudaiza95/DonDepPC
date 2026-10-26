@@ -1,0 +1,29 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net48</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <UseWindowsForms>true</UseWindowsForms>
+    <AssemblyName>DonDepPC</AssemblyName>
+    <RootNamespace>DonDepPC</RootNamespace>
+    <ApplicationIcon>..\DonDepPC.ico</ApplicationIcon>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <PlatformTarget>x64</PlatformTarget>
+    <OutputPath>..\bin\$(Configuration)\</OutputPath>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Reference Include="System.Management" />
+    <Reference Include="Microsoft.VisualBasic" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="MainWindow.xaml">
+      <LogicalName>SachGon.MainWindow.xaml</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\DonDepPC.png">
+      <LogicalName>SachGon.Icon.png</LogicalName>
+    </EmbeddedResource>
+  </ItemGroup>
+</Project>

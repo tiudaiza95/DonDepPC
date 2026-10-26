@@ -1,0 +1,51 @@
+﻿DỌN DẸP PC 0.6
+
+Mở biểu tượng Dọn Dẹp PC trên Desktop.
+
+DỌN RÁC TỔNG QUAN
+1. Bấm Quét rác tổng quan. Tùy chọn duyệt ổ cứng bổ sung thống kê tệp lớn;
+   bỏ chọn để tập trung vào vị trí rác đã xác định và lịch sử gỡ.
+2. Xem danh sách và lý do. Rác đề xuất được đánh dấu; phần dư có thể chứa
+   dữ liệu cá nhân không được tự đánh dấu. Có nút bỏ chọn tất cả.
+3. Đóng Chrome/Edge/VS Code liên quan rồi bấm Dọn mục đã chọn.
+4. Xem cột Kết quả: tệp thay đổi, đang dùng hoặc không đủ điều kiện được giữ lại.
+
+Phạm vi: Temp người dùng, Windows Temp trong quyền truy cập hiện có, cache
+Chrome/Edge/VS Code đã nhận diện, CrashDumps và báo cáo WER cũ hơn 7 ngày.
+Không dọn cookie, mật khẩu hay phiên đăng nhập. Không xóa tệp chỉ vì cũ,
+rỗng hoặc nghi bị lỗi. Xóa báo cáo lỗi không sửa nguyên nhân lỗi.
+Quét cache có giới hạn số kết quả; Chi tiết phạm vi quét ghi rõ phần bị giới hạn.
+Phần dư dựa trên lịch sử gỡ công cụ đã ghi nhận; không xác định được mọi ứng
+ dụng đã gỡ trước đó. Registry/thành phần bảo vệ được xem riêng tại Quét chuyên sâu.
+Ưu tiên Thùng rác; nếu Windows hỏi xóa vĩnh viễn, hãy Hủy để giữ khả năng khôi phục.
+Dung lượng đề xuất/đã xử lý không đồng nghĩa dung lượng đĩa đã giải phóng.
+
+DRIVER VÀ THIẾT BỊ — KHÔNG GỌI WINDOWS UPDATE
+1. Quét thiết bị để đọc model, phiên bản, mã lỗi thiết bị và nguồn hãng.
+2. Chọn thiết bị, bấm Mở nguồn hãng. Trang hãng mở trong trình duyệt.
+   Với máy đã nhận diện: NVIDIA GTX 1650 SUPER dùng nguồn NVIDIA;
+   Realtek Audio / Intel Ethernet trên ASUS PRIME H510M-K dùng nguồn ASUS đúng model.
+   Chọn đúng hệ điều hành tại trang hãng. Chưa tự tải hoặc cài bằng nút này.
+3. Bộ cài EXE sử dụng giao diện của hãng. Với gói INF đã giải nén, mở phần
+   Cài gói driver đã tải / tùy chọn khác. Cần Administrator; phiên quản trị
+   mở đúng trang Driver, bạn quét và chọn lại thiết bị.
+4. Chọn INF: công cụ đối chiếu Hardware ID, nhóm thiết bị, chữ ký catalog.
+   Sau xác nhận, sao lưu driver bên thứ ba trước; nếu sao lưu lỗi thì dừng.
+   PnPUtil kiểm tra chữ ký/thành phần gói và thứ hạng tương thích, không ép
+   hạ phiên bản, không tự khởi động lại. Gói có thể áp dụng cho các thiết bị
+   khác cũng khớp; báo cáo ghi đường dẫn bản sao và kết quả thực tế.
+5. Quét lại để kiểm tra phiên bản. Mã thành công của PnPUtil không bảo đảm
+   driver mới đã thay thế driver hiện tại. Bản sao không bảo đảm hoàn tác mọi sự cố.
+
+Chưa có tự tìm/cập nhật mọi hãng bằng một nút. Chưa hỗ trợ INF cho BIOS/firmware
+và chipset nhóm System; dùng trình cài chính thức của hãng cho các gói này.
+Không tự thay đổi cấu hình dịch vụ cập nhật hệ điều hành.
+
+CÁC MỤC KHÁC
+- Ứng dụng: dùng bộ gỡ chính thức; tra cứu bằng Google; xem nguồn khi trùng tên.
+- Tệp lớn: chọn thư mục hoặc lấy từ quét tổng quan, đánh dấu tệp rồi dọn.
+- Tệp trùng: quét → Tự chọn bản trùng để dọn → xem lại → Dọn bản đã chọn.
+  Giữ ít nhất một bản; đọc lại nội dung trước xử lý. Không gộp tệp khác nội dung.
+- Công cụ ổ đĩa: hai thẻ Disk Cleanup và tối ưu HDD/SSD mở công cụ Windows.
+- Nhật ký và bản sao ở dữ liệu ứng dụng; thư mục dữ liệu cũ SachGon được giữ
+  để không mất lịch sử. Bản sao driver được bảo vệ khỏi chức năng xóa tệp thông thường.

@@ -1,0 +1,36 @@
+Read-only audit. No cleanup, download, driver installation or OS update.
+Cleanup roots: 24
+Candidate files: 20997
+Recommended files: 20997
+Candidate bytes: 2599243485
+Remnants requiring manual review: 0
+Driver/device records: 155
+Board: ASUSTeK COMPUTER INC. · PRIME H510M-K
+
+Temp tài khoản · hơn 7 ngày: 41 tệp, bỏ qua 1
+Windows Temp · không nâng quyền: 0 tệp, bỏ qua 1
+Chrome · Default · Cache\Cache_Data: 90 tệp, bỏ qua 0
+Chrome · Default · Code Cache: 578 tệp, bỏ qua 0
+Chrome · Default · GPUCache: 32 tệp, bỏ qua 0
+Chrome · Profile 1 · Cache\Cache_Data: 984 tệp, bỏ qua 0
+Chrome · Profile 1 · Code Cache: 5000 tệp, bỏ qua 0 · kết quả một phần
+Chrome · Profile 1 · GPUCache: 27 tệp, bỏ qua 0
+Chrome · Profile 2 · Cache\Cache_Data: 0 tệp, bỏ qua 0
+Chrome · Profile 2 · Code Cache: 3562 tệp, bỏ qua 0
+Chrome · Profile 2 · GPUCache: 3 tệp, bỏ qua 0
+Chrome · Profile 4 · Cache\Cache_Data: 250 tệp, bỏ qua 0
+Chrome · Profile 4 · Code Cache: 2883 tệp, bỏ qua 0
+Chrome · Profile 4 · GPUCache: 2 tệp, bỏ qua 0
+Chrome · Profile 7 · Cache\Cache_Data: 1819 tệp, bỏ qua 0
+Chrome · Profile 7 · Code Cache: 5000 tệp, bỏ qua 0 · kết quả một phần
+Chrome · Profile 7 · GPUCache: 5 tệp, bỏ qua 0
+Edge · Default · Cache\Cache_Data: 53 tệp, bỏ qua 0
+Edge · Default · Code Cache: 637 tệp, bỏ qua 0
+Edge · Default · GPUCache: 5 tệp, bỏ qua 0
+Visual Studio Code · Cache: 3 tệp, bỏ qua 0
+Visual Studio Code · Code Cache: 5 tệp, bỏ qua 0
+Visual Studio Code · CachedData: 12 tệp, bỏ qua 0
+Báo cáo ứng dụng bị lỗi · CrashDumps: 6 tệp, bỏ qua 0
+
+NVIDIA GeForce GTX 1650 SUPER | 32.0.15.9144 | Thiết bị không báo lỗi | NVIDIA App / driver NVIDIA
+Realtek High Definition Audio | 6.0.9123.1 | Thiết bị không báo lỗi | ASUS PRIME H510M-K · chọn đúng hệ điều hành

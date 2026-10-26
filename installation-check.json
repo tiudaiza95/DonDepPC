@@ -1,0 +1,10 @@
+{
+  "Version": "0.9.0.0",
+  "SourceHash": "EE77517B9F80279386F9C3497EB5A3B40BF52F89C0553956FCA5153442204847",
+  "InstalledHash": "EE77517B9F80279386F9C3497EB5A3B40BF52F89C0553956FCA5153442204847",
+  "Shortcut": "C:\\Users\\Admin\\Desktop\\Dọn Dẹp PC.lnk",
+  "Target": "C:\\Users\\Admin\\AppData\\Local\\Programs\\DonDepPC\\DonDepPC.exe",
+  "Icon": "C:\\Users\\Admin\\AppData\\Local\\Programs\\DonDepPC\\DonDepPC.ico,0",
+  "Checks": 96,
+  "LegacyUpdateSearchExit": 2
+}

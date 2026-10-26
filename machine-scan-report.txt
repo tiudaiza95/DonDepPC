@@ -1,0 +1,7 @@
+Đã duyệt xong phạm vi có thể truy cập
+Ổ/thư mục: C:\, D:\
+552,013 tệp · 118,810 thư mục · 174.9 GB dung lượng tệp ghi nhận
+161 tệp từ 100 MB · hiển thị tối đa 1.000 tệp lớn nhất
+662 mục/thư mục bỏ qua: không có quyền, liên kết, lỗi đọc hoặc khu vực loại trừ
+Thời gian: 00:02:25
+Đọc thông tin tệp, không đọc toàn bộ nội dung, không quét virus. Không duyệt ổ mạng/USB, liên kết, Thùng rác và System Volume Information. Dung lượng logic có thể tính cả hard link; không phải dung lượng có thể dọn.
