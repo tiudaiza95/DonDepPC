@@ -1,18 +1,18 @@
-# Dọn Dẹp PC (DonDepPC Pro Max)
+# Dọn Dẹp PC (DonDepPC Pro Max v1.0)
 
 Ứng dụng dọn dẹp hệ thống, tối ưu hiệu năng và gỡ cài đặt chuyên sâu mã nguồn mở dành cho Windows.  
-Được thiết kế kết hợp những ưu điểm vượt trội của **CCleaner** và **IObit Uninstaller**, bổ sung các công cụ bảo trì ổ đĩa và cập nhật driver an toàn tuyệt đối.
+Được thiết kế kết hợp hoàn hảo những ưu điểm vượt trội của **CCleaner** và **IObit Uninstaller**, bổ sung các công cụ bảo trì ổ đĩa và cập nhật driver an toàn tuyệt đối.
 
 ![DonDepPC Icon](DonDepPC.png)
 
 ---
 
-## 🌟 Tính năng nổi bật
+## 🌟 Tính năng nổi bật trong Phiên bản 1.0 Chính thức
 
 1. **Tổng quan & Giám sát hiệu năng thời gian thực**:
    - Tự động nhận diện cấu hình phần cứng: Hệ điều hành, CPU, GPU, Bo mạch chủ.
    - Giám sát trực quan mức tiêu thụ CPU, RAM và dung lượng ổ C: theo thời gian thực.
-   - **Quét & Tối ưu 1-Click**: Tự động giải phóng bộ nhớ đệm RAM, dọn tệp rác hệ thống, xóa cache trình duyệt (Chrome, Edge, Brave, v.v.).
+   - **Quét & Tối ưu 1-Click**: Tự động giải phóng bộ nhớ đệm RAM, dọn tệp rác hệ thống, xóa cache trình duyệt (Chrome, Edge, Brave, Cốc Cốc, Firefox, Opera, Vivaldi) và báo cáo lỗi CrashDumps/WER.
    - Bộ dọn dẹp Registry mồ côi kèm tính năng tự động sao lưu an toàn UTF-16LE.
 
 2. **Gỡ cài đặt & Quản lý ứng dụng chuyên sâu**:
@@ -30,9 +30,15 @@
 4. **Chăm sóc & Quản lý ổ đĩa toàn diện**:
    - Tích hợp 6 công cụ mạnh mẽ: Dọn dung lượng Windows, Tối ưu ổ đĩa Defrag/Trim, Kiểm tra lỗi hệ thống tập tin (chkdsk), Quản lý phân vùng, Phân tích chiếm dụng ổ C:, Quản lý tệp ngủ đông (Hibernate) & Nén Compact OS.
 
-5. **Đa ngôn ngữ & Giao diện hiện đại**:
+5. **Driver từ đúng nhà sản xuất**:
+   - Kiểm kê phần cứng máy tính và trạng thái thiết bị.
+   - 1-Click mở Device Manager của Windows.
+   - Dẫn link tải driver từ đúng trang chủ chính thức của nhà sản xuất, cài đặt gói INF an toàn sau khi đã tự động sao lưu driver.
+
+6. **Đa ngôn ngữ & Giao diện hiện đại**:
    - Hỗ trợ chuyển đổi mượt mà giữa **Tiếng Việt** và **English (US)** trong phần Cài đặt.
    - Hỗ trợ Chế độ Sáng / Tối (Dark Mode) và Thu gọn / Mở rộng thanh bên.
+   - Lối tắt trực tiếp đến Kho mã nguồn GitHub và Kiểm tra bản cập nhật.
 
 ---
 

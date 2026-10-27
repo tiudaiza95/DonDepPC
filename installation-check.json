@@ -1,7 +1,7 @@
 {
-  "Version": "0.9.0.0",
-  "SourceHash": "A0DD023B0CA9315EECF253DA9867E8638E23FFFF857BFAE7B1569DC10A6C9002",
-  "InstalledHash": "A0DD023B0CA9315EECF253DA9867E8638E23FFFF857BFAE7B1569DC10A6C9002",
+  "Version": "1.0.0.0",
+  "SourceHash": "729F566CD4060A6B5B91067CCEE5B3947E7BE16E8F951B077D14E7D9CD1872C9",
+  "InstalledHash": "729F566CD4060A6B5B91067CCEE5B3947E7BE16E8F951B077D14E7D9CD1872C9",
   "Shortcut": "C:\\Users\\Admin\\Desktop\\Dọn Dẹp PC.lnk",
   "Target": "C:\\Users\\Admin\\AppData\\Local\\Programs\\DonDepPC\\DonDepPC.exe",
   "Icon": "C:\\Users\\Admin\\AppData\\Local\\Programs\\DonDepPC\\DonDepPC.ico,0",

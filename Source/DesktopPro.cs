@@ -49,7 +49,7 @@ partial class DesktopApp {
    return;
   }
   var dialog=new Window{
-   Title="Cài đặt & Tiện ích chuyên sâu · Dọn Dẹp PC 0.9",
+   Title="Cài đặt & Tiện ích chuyên sâu · Dọn Dẹp PC 1.0",
    Owner=window,
    Width=800,
    Height=540,
@@ -161,8 +161,13 @@ partial class DesktopApp {
   tab3.Content=t3Panel;
 
   var aboutCard=new StackPanel();
-  aboutCard.Children.Add(Label("Dọn Dẹp PC Pro Max · Phiên bản 0.9",15,true));
+  aboutCard.Children.Add(Label(I18n.T("Dọn Dẹp PC Pro Max · Phiên bản 1.0 Chính thức"),15,true));
   aboutCard.Children.Add(Label("Mô hình kết hợp hoàn hảo giữa:\n• CCleaner: Dọn tệp tạm, tối ưu RAM, dọn Registry và quản lý tiện ích trình duyệt.\n• IObit Uninstaller: Gỡ cài đặt chuyên sâu, gỡ hàng loạt và dọn sạch tàn dư rác 1-click.\n• Driver & System Tools: Giám sát phần cứng và bảo trì ổ đĩa chuyên sâu.\n\nCam kết an toàn tuyệt đối, minh bạch 100% dữ liệu và bảo vệ quyền riêng tư.",12));
+  
+  var githubRow=new WrapPanel{Margin=new Thickness(0,10,0,0)};
+  githubRow.Children.Add(ActionButton(I18n.T("Kiểm tra bản cập nhật trên GitHub"),()=>OpenUrl("https://github.com/tiudaiza95/DonDepPC/releases")));
+  githubRow.Children.Add(ActionButton(I18n.T("Mở Kho mã nguồn GitHub"),()=>OpenUrl("https://github.com/tiudaiza95/DonDepPC")));
+  aboutCard.Children.Add(githubRow);
   t3Panel.Children.Add(Card(aboutCard));
 
   dialog.ShowDialog();
@@ -269,7 +274,7 @@ partial class DesktopApp {
  }
 
  void OpenServicesDialog(){
-  var dialog=new Window{Title="Quản lý Dịch vụ bên thứ ba (Third-party Services) · Dọn Dẹp PC 0.9",Owner=window,Width=920,Height=640,MinWidth=750,MinHeight=480,WindowStartupLocation=WindowStartupLocation.CenterOwner,Resources=window.Resources,FontFamily=window.FontFamily,FontSize=13};
+  var dialog=new Window{Title="Quản lý Dịch vụ bên thứ ba (Third-party Services) · Dọn Dẹp PC 1.0",Owner=window,Width=920,Height=640,MinWidth=750,MinHeight=480,WindowStartupLocation=WindowStartupLocation.CenterOwner,Resources=window.Resources,FontFamily=window.FontFamily,FontSize=13};
   dialog.SetResourceReference(Window.BackgroundProperty,"Canvas");dialog.SetResourceReference(Window.ForegroundProperty,"Ink");
   var root=new DockPanel{Margin=new Thickness(20)};dialog.Content=root;
   var header=new StackPanel{Margin=new Thickness(0,0,0,14)};DockPanel.SetDock(header,Dock.Top);root.Children.Add(header);
@@ -361,7 +366,7 @@ partial class DesktopApp {
    MessageBox.Show(window,"Tất cả các mục bạn chọn đều là thành phần bảo vệ của hệ thống; không thể gỡ bỏ.","Cảnh báo",MessageBoxButton.OK,MessageBoxImage.Warning);
    return;
   }
-  var queueDialog=new Window{Title="⚡ Hàng đợi Gỡ cài đặt hàng loạt (Batch Uninstall) · Dọn Dẹp PC 0.9",Owner=window,Width=780,Height=540,MinWidth=650,MinHeight=420,WindowStartupLocation=WindowStartupLocation.CenterOwner,Resources=window.Resources,FontFamily=window.FontFamily,FontSize=13};
+  var queueDialog=new Window{Title="⚡ Hàng đợi Gỡ cài đặt hàng loạt (Batch Uninstall) · Dọn Dẹp PC 1.0",Owner=window,Width=780,Height=540,MinWidth=650,MinHeight=420,WindowStartupLocation=WindowStartupLocation.CenterOwner,Resources=window.Resources,FontFamily=window.FontFamily,FontSize=13};
   queueDialog.SetResourceReference(Window.BackgroundProperty,"Canvas");queueDialog.SetResourceReference(Window.ForegroundProperty,"Ink");
   var root=new DockPanel{Margin=new Thickness(20)};queueDialog.Content=root;
   var top=new StackPanel{Margin=new Thickness(0,0,0,12)};DockPanel.SetDock(top,Dock.Top);root.Children.Add(top);
@@ -415,7 +420,7 @@ partial class DesktopApp {
  }
 
  void OpenRegistryCleanerDialog(){
-  var dialog=new Window{Title="Dọn dẹp Registry thông minh & An toàn · Dọn Dẹp PC 0.9",Owner=window,Width=960,Height=650,MinWidth=750,MinHeight=480,WindowStartupLocation=WindowStartupLocation.CenterOwner,Resources=window.Resources,FontFamily=window.FontFamily,FontSize=13};
+  var dialog=new Window{Title="Dọn dẹp Registry thông minh & An toàn · Dọn Dẹp PC 1.0",Owner=window,Width=960,Height=650,MinWidth=750,MinHeight=480,WindowStartupLocation=WindowStartupLocation.CenterOwner,Resources=window.Resources,FontFamily=window.FontFamily,FontSize=13};
   dialog.SetResourceReference(Window.BackgroundProperty,"Canvas");dialog.SetResourceReference(Window.ForegroundProperty,"Ink");
   var root=new DockPanel{Margin=new Thickness(20)};dialog.Content=root;
   var header=new StackPanel{Margin=new Thickness(0,0,0,12)};DockPanel.SetDock(header,Dock.Top);root.Children.Add(header);
@@ -465,7 +470,7 @@ partial class DesktopApp {
  }
 
  void OpenBrowserExtensionsDialog(){
-  var dialog=new Window{Title="Quản lý Tiện ích mở rộng Trình duyệt (Browser Extensions) · Dọn Dẹp PC 0.9",Owner=window,Width=920,Height=620,MinWidth=750,MinHeight=460,WindowStartupLocation=WindowStartupLocation.CenterOwner,Resources=window.Resources,FontFamily=window.FontFamily,FontSize=13};
+  var dialog=new Window{Title="Quản lý Tiện ích mở rộng Trình duyệt (Browser Extensions) · Dọn Dẹp PC 1.0",Owner=window,Width=920,Height=620,MinWidth=750,MinHeight=460,WindowStartupLocation=WindowStartupLocation.CenterOwner,Resources=window.Resources,FontFamily=window.FontFamily,FontSize=13};
   dialog.SetResourceReference(Window.BackgroundProperty,"Canvas");dialog.SetResourceReference(Window.ForegroundProperty,"Ink");
   var root=new DockPanel{Margin=new Thickness(20)};dialog.Content=root;
   var header=new StackPanel{Margin=new Thickness(0,0,0,12)};DockPanel.SetDock(header,Dock.Top);root.Children.Add(header);

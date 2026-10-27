@@ -236,10 +236,89 @@ partial class DesktopApp {
  string JunkSummary(){var remaining=junkReport.Items.Where(x=>x.CanClean).ToList();return remaining.Count+" tệp có thể xem xét · "+Features.Size(remaining.Sum(x=>x.Bytes))+"\nĐã chọn "+remaining.Count(x=>x.Selected)+" tệp · "+Features.Size(remaining.Where(x=>x.Selected).Sum(x=>x.Bytes))+". Phần dư cần xem: "+remaining.Count(x=>!x.Recommended)+" tệp. Quét "+junkReport.Roots+" vị trí rác.";}
  void ShowLongReport(string title,string text){var dialog=new Window{Title=title,Owner=window,Width=850,Height=600,WindowStartupLocation=WindowStartupLocation.CenterOwner,Resources=window.Resources};dialog.SetResourceReference(Window.BackgroundProperty,"Canvas");dialog.Content=new TextBox{Text=text,IsReadOnly=true,TextWrapping=TextWrapping.Wrap,VerticalScrollBarVisibility=ScrollBarVisibility.Auto,Margin=new Thickness(18)};dialog.ShowDialog();}
  async Task VendorActivity(Func<Task> action){var clock=Stopwatch.StartNew();var timer=new DispatcherTimer{Interval=TimeSpan.FromSeconds(1)};string last="";timer.Tick+=(s,e)=>{if(driverStatus.Text!=last)last=driverStatus.Text.Split(new[]{"\nThời gian:"},StringSplitOptions.None)[0];driverStatus.Text=last+"\nThời gian: "+clock.Elapsed.ToString(@"mm\:ss");};timer.Start();try{await action();}catch(Exception ex){driverStatus.Text="Không hoàn tất: "+ex.Message;throw;}finally{timer.Stop();}}
- void BuildDriverPage(){Text("Heading","Driver từ đúng nhà sản xuất.");Text("Subtitle","Kiểm kê tại máy · nguồn hãng · cài gói cục bộ có xác minh");var dock=new DockPanel();proHost.Children.Add(dock);var top=new StackPanel();DockPanel.SetDock(top,Dock.Top);dock.Children.Add(top);var panel=new StackPanel();panel.Children.Add(Label("Card màn hình, âm thanh, mạng và thiết bị",20,true));panel.Children.Add(Label("Không kết nối Windows Update, không cập nhật hệ điều hành. Quét để xem thiết bị báo lỗi, phiên bản đang cài và nguồn tải của hãng. Ngày driver cũ không có nghĩa là cần thay."));var actions=new WrapPanel();panel.Children.Add(actions);driverStatus=Label("Bấm Quét thiết bị. Sau đó chọn thiết bị và mở nguồn hãng.");panel.Children.Add(driverStatus);top.Children.Add(Card(panel));driversGrid=new DataGrid{IsReadOnly=true,ItemsSource=driverRecords};proControls.Add(driversGrid);AddColumn(driversGrid,"THIẾT BỊ","Device",300);AddColumn(driversGrid,"TRẠNG THÁI","Status",200);AddColumn(driversGrid,"PHIÊN BẢN","Version",140);AddColumn(driversGrid,"NGUỒN CHÍNH THỨC","Source",270);AddColumn(driversGrid,"NHÓM","Class",110);dock.Children.Add(driversGrid);
-  var scan=WorkButton("1. Quét thiết bị",async()=>{await VendorActivity(async()=>{driverStatus.Text="Đang đọc phần cứng và trạng thái driver tại máy…";driverRecords=await Task.Run(()=>VendorDrivers.Scan());driversGrid.ItemsSource=driverRecords;driversGrid.SelectedItem=driverRecords.FirstOrDefault(x=>x.Class=="DISPLAY")??driverRecords.FirstOrDefault();driverStatus.Text="Đã đọc "+driverRecords.Count+" thiết bị · "+VendorDrivers.Board+"\nChọn thiết bị cần xử lý. Không tuyên bố driver lỗi thời khi chưa đối chiếu với hãng.";});});scan.Style=(Style)window.Resources["Primary"];actions.Children.Add(scan);
-  actions.Children.Add(ActionButton("2. Mở nguồn hãng của thiết bị",()=>{var record=driversGrid.SelectedItem as DriverRecord;if(record==null){driverStatus.Text="Chọn một thiết bị trong bảng trước.";return;}if(String.IsNullOrEmpty(record.Url)){driverStatus.Text="Chưa có nguồn hãng được xác minh cho thiết bị này. Sao chép mã phần cứng để tra với nhà sản xuất; không cài gói đoán theo tên.";return;}OpenUrl(record.Url);driverStatus.Text="Đã mở "+record.Source+". Kiểm tra đúng model và phiên bản Windows trên trang hãng; chưa tải/cài trong ứng dụng.";}));
-  var extra=new WrapPanel();extra.Children.Add(WorkButton("Cài gói INF đã tải từ hãng",async()=>{var record=driversGrid.SelectedItem as DriverRecord;if(record==null){driverStatus.Text="Chọn thiết bị muốn cập nhật trước.";return;}if(!Drivers.Administrator()){RequestAdministrator();return;}var picker=new Microsoft.Win32.OpenFileDialog{Title="Chọn INF trong gói driver chính thức đã giải nén",Filter="Gói driver (*.inf)|*.inf",CheckFileExists=true};if(picker.ShowDialog(window)!=true)return;InfPlan plan=null;await VendorActivity(async()=>{driverStatus.Text="Đang đối chiếu mã phần cứng và chữ ký catalog…";plan=await Task.Run(()=>VendorDrivers.Inspect(picker.FileName,record));});if(!Confirm("Cài gói driver cục bộ này?\nThiết bị đã chọn: "+record.Device+"\n"+plan.Path+"\nINF có mã phần cứng tương ứng và catalog có chữ ký hợp lệ. PnPUtil sẽ kiểm tra gói và xếp hạng; có thể áp dụng cho các thiết bị khác cũng khớp gói.\nSao lưu các driver bên thứ ba trước khi cài; dừng nếu sao lưu lỗi. Lưu công việc trước, có thể gián đoạn màn hình/mạng. Không tự khởi động lại."))return;await VendorActivity(async()=>{var progress=new Progress<string>(s=>driverStatus.Text=s);string report=await Task.Run(()=>VendorDrivers.Install(plan,progress));ShowLongReport("Kết quả cài gói driver",report);driverStatus.Text="Đã kết thúc thao tác. Xem báo cáo; quét lại thiết bị để đối chiếu phiên bản thực tế.";});}));
-  extra.Children.Add(ActionButton("Sao chép mã phần cứng",()=>{var record=driversGrid.SelectedItem as DriverRecord;if(record!=null)Clipboard.SetText(record.Device+"\n"+record.Version+"\n"+String.Join("\n",record.HardwareIds??new string[0])+"\n"+VendorDrivers.Board);}));extra.Children.Add(ActionButton("Mở quyền quản trị",RequestAdministrator));extra.Children.Add(ActionButton("Mở bản sao driver",()=>{string path=Path.Combine(Engine.Data,"Driver-backups");Directory.CreateDirectory(path);Process.Start(new ProcessStartInfo("explorer.exe",Maintenance.Quote(path)){UseShellExecute=true});}));var expander=new Expander{Header="Cài gói driver đã tải / tùy chọn khác",Content=extra,Margin=new Thickness(0,0,0,12)};expander.SetResourceReference(Control.ForegroundProperty,"Ink");top.Children.Add(expander);top.Children.Add(Label("Nguồn hãng được mở trong trình duyệt; bộ cài EXE dùng giao diện của hãng. Chức năng cài INF không hỗ trợ BIOS/firmware và không ép hạ phiên bản. Chưa có cập nhật tự động mọi hãng bằng một nút.",11));
+ void BuildDriverPage(){
+  Text("Heading",I18n.T("Driver từ đúng nhà sản xuất."));
+  Text("Subtitle",I18n.T("Kiểm kê tại máy — nguồn hãng — cài gói cục bộ có xác minh"));
+  var dock=new DockPanel();
+  proHost.Children.Add(dock);
+  var top=new StackPanel();
+  DockPanel.SetDock(top,Dock.Top);
+  dock.Children.Add(top);
+  var panel=new StackPanel();
+  panel.Children.Add(Label(I18n.T("Card màn hình, âm thanh, mạng và thiết bị"),20,true));
+  panel.Children.Add(Label(I18n.T("Không kết nối Windows Update, không cập nhật hệ điều hành. Quét để xem thiết bị báo lỗi, phiên bản đang cài và nguồn tải của hãng. Ngày driver cũ không có nghĩa là cần thay.")));
+  var actions=new WrapPanel();
+  panel.Children.Add(actions);
+  driverStatus=Label(driverRecords.Count==0?I18n.T("Bấm Quét thiết bị. Sau đó chọn thiết bị và mở nguồn hãng."):"Đã nạp "+driverRecords.Count+" thiết bị.");
+  panel.Children.Add(driverStatus);
+  top.Children.Add(Card(panel));
+
+  driversGrid=new DataGrid{IsReadOnly=true,ItemsSource=driverRecords};
+  proControls.Add(driversGrid);
+  AddColumn(driversGrid,I18n.T("THIẾT BỊ"),"Device",300);
+  AddColumn(driversGrid,I18n.T("TRẠNG THÁI"),"Status",200);
+  AddColumn(driversGrid,I18n.T("PHIÊN BẢN"),"Version",140);
+  AddColumn(driversGrid,I18n.T("NGUỒN CHÍNH THỨC"),"Source",270);
+  AddColumn(driversGrid,I18n.T("NHÓM"),"Class",110);
+  dock.Children.Add(driversGrid);
+
+  var scan=WorkButton(I18n.T("1. Quét thiết bị"),async()=>{
+   await VendorActivity(async()=>{
+    driverStatus.Text="Đang đọc phần cứng và trạng thái driver tại máy…";
+    driverRecords=await Task.Run(()=>VendorDrivers.Scan());
+    driversGrid.ItemsSource=driverRecords;
+    driversGrid.SelectedItem=driverRecords.FirstOrDefault(x=>x.Class=="DISPLAY")??driverRecords.FirstOrDefault();
+    driverStatus.Text="Đã đọc "+driverRecords.Count+" thiết bị · "+VendorDrivers.Board+"\nChọn thiết bị cần xử lý. Không tuyên bố driver lỗi thời khi chưa đối chiếu với hãng.";
+   });
+  });
+  scan.Style=(Style)window.Resources["Primary"];
+  actions.Children.Add(scan);
+
+  actions.Children.Add(ActionButton(I18n.T("2. Mở nguồn hãng của thiết bị"),()=>{
+   var record=driversGrid.SelectedItem as DriverRecord;
+   if(record==null){driverStatus.Text="Chọn một thiết bị trong bảng trước.";return;}
+   if(String.IsNullOrEmpty(record.Url)){driverStatus.Text="Chưa có nguồn hãng được xác minh cho thiết bị này. Sao chép mã phần cứng để tra với nhà sản xuất; không cài gói đoán theo tên.";return;}
+   OpenUrl(record.Url);
+   driverStatus.Text="Đã mở "+record.Source+". Kiểm tra đúng model và phiên bản Windows trên trang hãng; chưa tải/cài trong ứng dụng.";
+  }));
+
+  actions.Children.Add(ActionButton(I18n.T("Mở Device Manager"),()=>OpenNative("devmgmt.msc")));
+
+  var extra=new WrapPanel();
+  extra.Children.Add(WorkButton(I18n.T("Cài gói INF đã tải từ hãng"),async()=>{
+   var record=driversGrid.SelectedItem as DriverRecord;
+   if(record==null){driverStatus.Text="Chọn thiết bị muốn cập nhật trước.";return;}
+   if(!Drivers.Administrator()){RequestAdministrator();return;}
+   var picker=new Microsoft.Win32.OpenFileDialog{Title="Chọn INF trong gói driver chính thức đã giải nén",Filter="Gói driver (*.inf)|*.inf",CheckFileExists=true};
+   if(picker.ShowDialog(window)!=true)return;
+   InfPlan plan=null;
+   await VendorActivity(async()=>{
+    driverStatus.Text="Đang đối chiếu mã phần cứng và chữ ký catalog…";
+    plan=await Task.Run(()=>VendorDrivers.Inspect(picker.FileName,record));
+   });
+   if(!Confirm("Cài gói driver cục bộ này?\nThiết bị đã chọn: "+record.Device+"\n"+plan.Path+"\nINF có mã phần cứng tương ứng và catalog có chữ ký hợp lệ. PnPUtil sẽ kiểm tra gói và xếp hạng; có thể áp dụng cho các thiết bị khác cũng khớp gói.\nSao lưu các driver bên thứ ba trước khi cài; dừng nếu sao lưu lỗi. Lưu công việc trước, có thể gián đoạn màn hình/mạng. Không tự khởi động lại."))return;
+   await VendorActivity(async()=>{
+    var progress=new Progress<string>(s=>driverStatus.Text=s);
+    string report=await Task.Run(()=>VendorDrivers.Install(plan,progress));
+    ShowLongReport("Kết quả cài gói driver",report);
+    driverStatus.Text="Đã kết thúc thao tác. Xem báo cáo; quét lại thiết bị để đối chiếu phiên bản thực tế.";
+   });
+  }));
+
+  extra.Children.Add(ActionButton(I18n.T("Sao chép mã phần cứng"),()=>{
+   var record=driversGrid.SelectedItem as DriverRecord;
+   if(record!=null)Clipboard.SetText(record.Device+"\n"+record.Version+"\n"+String.Join("\n",record.HardwareIds??new string[0])+"\n"+VendorDrivers.Board);
+  }));
+  extra.Children.Add(ActionButton(I18n.T("Mở quyền quản trị"),RequestAdministrator));
+  extra.Children.Add(ActionButton(I18n.T("Mở bản sao driver"),()=>{
+   string path=Path.Combine(Engine.Data,"Driver-backups");
+   Directory.CreateDirectory(path);
+   Process.Start(new ProcessStartInfo("explorer.exe",Maintenance.Quote(path)){UseShellExecute=true});
+  }));
+
+  var expander=new Expander{Header=I18n.T("Cài gói driver đã tải / tùy chọn khác"),Content=extra,Margin=new Thickness(0,0,0,12)};
+  expander.SetResourceReference(Control.ForegroundProperty,"Ink");
+  top.Children.Add(expander);
+  top.Children.Add(Label(I18n.T("Nguồn hãng được mở trong trình duyệt; bộ cài EXE dùng giao diện của hãng. Chức năng cài INF không hỗ trợ BIOS/firmware và không ép hạ phiên bản. Chưa có cập nhật tự động mọi hãng bằng một nút."),11));
  }
 }

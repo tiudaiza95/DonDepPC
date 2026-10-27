@@ -124,6 +124,28 @@ static class I18n {
   Add("◐ Chuyển sang Chế độ tối", "◐ Switch to Dark Mode");
   Add("Mở rộng thanh bên", "Expand Sidebar");
   Add("Thu gọn thanh bên", "Collapse Sidebar");
+
+  // Drivers Page
+  Add("Mở Device Manager", "Open Device Manager");
+  Add("1. Quét thiết bị", "1. Scan Devices");
+  Add("2. Mở nguồn hãng của thiết bị", "2. Open Manufacturer Source");
+  Add("Cài gói INF đã tải từ hãng", "Install Verified Local INF Driver");
+  Add("Sao chép mã phần cứng", "Copy Hardware IDs");
+  Add("Mở quyền quản trị", "Run as Administrator");
+  Add("Mở bản sao driver", "Open Driver Backups");
+  Add("Cài gói driver đã tải / tùy chọn khác", "Install Local Driver / Advanced Options");
+  Add("Card màn hình, âm thanh, mạng và thiết bị", "Display, Audio, Network and Peripheral Devices");
+  Add("THIẾT BỊ", "DEVICE");
+  Add("TRẠNG THÁI", "STATUS");
+  Add("PHIÊN BẢN", "VERSION");
+  Add("NGUỒN CHÍNH THỨC", "OFFICIAL SOURCE");
+  Add("NHÓM", "CLASS");
+
+  // Version 1.0 & About
+  Add("Dọn Dẹp PC Pro Max · Phiên bản 1.0 Chính thức", "DonDepPC Pro Max · Official Version 1.0");
+  Add("Kiểm tra bản cập nhật trên GitHub", "Check for Updates on GitHub");
+  Add("Mở Kho mã nguồn GitHub", "Open GitHub Repository");
+  Add("Sao chép thông tin phiên bản", "Copy Version Information");
  }
 
  public static void Init() {
