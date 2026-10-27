@@ -14,7 +14,9 @@ using Microsoft.Win32;
 
 public partial class AppEntry {
  public string DisplayIcon, InstalledOn, Website;
- public long EstimatedBytes; public bool SystemComponent, MeasuredFromDisk;
+ public long EstimatedBytes; public bool SystemComponent, MeasuredFromDisk;
+ public bool IsUwp; public string PackageFullName;
+ public string AppType { get { return IsUwp ? "UWP (Store)" : "Win32 (Desktop)"; } }
  public int Number {get;set;}
  [XmlIgnore] public List<AppEntry> Sources=new List<AppEntry>();
  [XmlIgnore] public Advisory Advice;
@@ -29,7 +31,7 @@ public partial class AppEntry {
  public bool Caution {get{return Advice==null||Advice.Caution||SystemComponent;}}
  public bool CanUninstall {get{return !Protected&&!String.IsNullOrWhiteSpace(Command);}}
  public bool Protected {get{return Advice!=null&&Advice.Protected;}}
- public string Architecture {get{return Hive==RegistryHive.CurrentUser?"Nguồn HKCU dùng chung; chưa xác minh kiến trúc":(View==RegistryView.Registry64?"Nguồn Registry 64-bit":"Nguồn Registry 32-bit")+"; không khẳng định kiến trúc tệp";}}
+ public string Architecture {get{return IsUwp?"UWP (Universal Windows Platform) · Windows Store":(Hive==RegistryHive.CurrentUser?"Nguồn HKCU dùng chung; chưa xác minh kiến trúc":(View==RegistryView.Registry64?"Nguồn Registry 64-bit":"Nguồn Registry 32-bit")+"; không khẳng định kiến trúc tệp");}}
  public string SourceSummary {get{return Sources.Count+" nguồn đọc · "+Scope;}}
 }
 public class Advisory {
@@ -79,7 +81,24 @@ static partial class Engine {
 static class Icons {
  [DllImport("shell32.dll",CharSet=CharSet.Unicode)]static extern uint ExtractIconEx(string file,int index,IntPtr[] large,IntPtr[] small,uint count);
  [DllImport("user32.dll")]static extern bool DestroyIcon(IntPtr h);
- public static ImageSource ForApp(AppEntry a){IntPtr h=IntPtr.Zero;try{string path=Engine.KnownExecutable(a);int index=0;string raw=a.DisplayIcon??"";int comma=raw.LastIndexOf(',');if(comma>0)Int32.TryParse(raw.Substring(comma+1),out index);var icons=new IntPtr[1];if(path!="")ExtractIconEx(path,index,icons,null,1);h=icons[0];if(h!=IntPtr.Zero){var bmp=Imaging.CreateBitmapSourceFromHIcon(h,Int32Rect.Empty,BitmapSizeOptions.FromWidthAndHeight(28,28));bmp.Freeze();return bmp;}}catch{}finally{if(h!=IntPtr.Zero)DestroyIcon(h);}var fallback=Imaging.CreateBitmapSourceFromHIcon(System.Drawing.SystemIcons.Application.Handle,Int32Rect.Empty,BitmapSizeOptions.FromWidthAndHeight(28,28));fallback.Freeze();return fallback;}
+ public static ImageSource ForApp(AppEntry a){
+  if(a.IsUwp){
+   string iconPath=UwpManager.FindUwpIcon(a.Location);
+   if(!String.IsNullOrEmpty(iconPath)&&File.Exists(iconPath)){
+    try{
+     var bi=new BitmapImage();
+     bi.BeginInit();
+     bi.UriSource=new Uri(iconPath);
+     bi.DecodePixelWidth=28;
+     bi.DecodePixelHeight=28;
+     bi.CacheOption=BitmapCacheOption.OnLoad;
+     bi.EndInit();
+     bi.Freeze();
+     return bi;
+    }catch{}
+   }
+  }
+  IntPtr h=IntPtr.Zero;try{string path=Engine.KnownExecutable(a);int index=0;string raw=a.DisplayIcon??"";int comma=raw.LastIndexOf(',');if(comma>0)Int32.TryParse(raw.Substring(comma+1),out index);var icons=new IntPtr[1];if(path!="")ExtractIconEx(path,index,icons,null,1);h=icons[0];if(h!=IntPtr.Zero){var bmp=Imaging.CreateBitmapSourceFromHIcon(h,Int32Rect.Empty,BitmapSizeOptions.FromWidthAndHeight(28,28));bmp.Freeze();return bmp;}}catch{}finally{if(h!=IntPtr.Zero)DestroyIcon(h);}var fallback=Imaging.CreateBitmapSourceFromHIcon(System.Drawing.SystemIcons.Application.Handle,Int32Rect.Empty,BitmapSizeOptions.FromWidthAndHeight(28,28));fallback.Freeze();return fallback;}
 }
 static class SignatureCheck {
  [StructLayout(LayoutKind.Sequential,CharSet=CharSet.Unicode)]struct FileInfoNative{public uint Size;public IntPtr Path,File,Subject;}

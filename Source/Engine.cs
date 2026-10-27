@@ -56,9 +56,9 @@ static partial class Engine {
     }}catch(System.Security.SecurityException){}catch(UnauthorizedAccessException){}
    }
   }
-  RawEntries=items;var unique=Deduplicate(items);DuplicateCount=items.Count-unique.Count;foreach(var app in unique)Catalog.Enrich(app);return unique;
+  RawEntries=items;var unique=Deduplicate(items);DuplicateCount=items.Count-unique.Count;foreach(var app in unique)Catalog.Enrich(app);if(!Testing){try{var uwp=UwpManager.GetInstalledApps();unique.AddRange(uwp);}catch{}}return unique;
  }
- public static bool Present(AppEntry a) { using(var r=RegistryKey.OpenBaseKey(a.Hive,a.View))using(var k=r.OpenSubKey(a.Key))return k!=null; }
+ public static bool Present(AppEntry a) { if(a.IsUwp)return UwpManager.IsPackageInstalled(a.PackageFullName); using(var r=RegistryKey.OpenBaseKey(a.Hive,a.View))using(var k=r.OpenSubKey(a.Key))return k!=null; }
  public static bool Within(string path,string parent) { return path.Equals(parent,StringComparison.OrdinalIgnoreCase)||path.StartsWith(parent.TrimEnd('\\')+"\\",StringComparison.OrdinalIgnoreCase); }
  public static bool SafeFolder(string path,AppEntry a,List<AppEntry> apps) {
   try {
@@ -96,6 +96,7 @@ static partial class Engine {
   AddShortcutRemnants(a,result); foreach(var item in result)MeasureRemnant(item);return result.GroupBy(x=>(x.IsRegistry?"R":"F")+x.Path,StringComparer.OrdinalIgnoreCase).Select(g=>g.First()).ToList();
  }
  public static ProcessStartInfo Uninstaller(AppEntry a) {
+  if(a.IsUwp)return new ProcessStartInfo("powershell.exe","-NoProfile -ExecutionPolicy Bypass -Command \"Remove-AppxPackage -Package '"+a.PackageFullName+"'\""){UseShellExecute=false,CreateNoWindow=true};
   if(String.IsNullOrWhiteSpace(a.Command))throw new Exception("Không có lệnh gỡ đăng ký. Dùng Cài đặt Windows hoặc bộ cài chính thức để sửa chữa.");
   string cmd=Environment.ExpandEnvironmentVariables(a.Command).Trim(),exe,args;
   if(cmd.StartsWith("\"")){int end=cmd.IndexOf('"',1);if(end<0)throw new Exception("Lệnh gỡ không hợp lệ.");exe=cmd.Substring(1,end-1);args=cmd.Substring(end+1).Trim();}

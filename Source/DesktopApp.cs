@@ -75,6 +75,7 @@ partial class DesktopApp {
   if(C<Button>("Uninstall")!=null)C<Button>("Uninstall").Content=I18n.T("Gỡ mục đã chọn");
   if(C<Button>("ForceUninstall")!=null)C<Button>("ForceUninstall").Content=I18n.T("⚡ Gỡ cưỡng chế");
   if(C<Button>("BatchUninstall")!=null)C<Button>("BatchUninstall").Content=I18n.T("⚡ Gỡ hàng loạt");
+   if(C<Button>("SetupMonitorBtn")!=null)C<Button>("SetupMonitorBtn").Content=I18n.T("📸 Giám sát cài đặt");
   if(C<Button>("ScanRemnants")!=null)C<Button>("ScanRemnants").Content=I18n.T("Quét phần dư");
   if(C<Button>("CleanRemnants")!=null)C<Button>("CleanRemnants").Content=I18n.T("Dọn mục đã chọn");
   if(C<Button>("HistoryRemnants")!=null)C<Button>("HistoryRemnants").Content=I18n.T("Phần dư đã ghi nhận");
@@ -105,7 +106,7 @@ partial class DesktopApp {
  }
  void LoadStartup(){C<DataGrid>("StartupGrid").ItemsSource=Features.Startups();}
  void LoadHistory(){string path=Path.Combine(Engine.Data,"activity.log");if(!File.Exists(path)){C<TextBox>("HistoryText").Text="Chưa có thao tác dọn hoặc thay đổi nào được ghi nhận.";return;}var queue=new Queue<string>();foreach(string line in File.ReadLines(path)){queue.Enqueue(line);if(queue.Count>150)queue.Dequeue();}C<TextBox>("HistoryText").Text=String.Join(Environment.NewLine,queue.Reverse());}
- void State(){StatePro();foreach(string name in new[]{"NavApps","NavTemp","NavLarge","NavStartup","NavHistory","RefreshApps","Search","AppsGrid","RemnantsGrid","ScanFiles","SelectFiles","CleanFiles","FilesGrid","ToggleStartup","RefreshStartup","StartupGrid","WindowsStartup","OpenFileLocation","OpenBackups","OpenRecycle","OpenLog","RefreshHistory"})C<Control>(name).IsEnabled=!busy;
+ void State(){StatePro();foreach(string name in new[]{"NavApps","NavTemp","NavLarge","NavStartup","NavHistory","RefreshApps","Search","AppsGrid","RemnantsGrid","ScanFiles","SelectFiles","CleanFiles","FilesGrid","ToggleStartup","RefreshStartup","StartupGrid","WindowsStartup","OpenFileLocation","OpenBackups","OpenRecycle","OpenLog","RefreshHistory","SetupMonitorBtn"})C<Control>(name).IsEnabled=!busy;
   C<Button>("Uninstall").IsEnabled=!busy&&target!=null&&!target.Protected&&!String.IsNullOrWhiteSpace(target.Command);C<Button>("ScanRemnants").IsEnabled=!busy&&target!=null;C<Button>("CleanRemnants").IsEnabled=!busy&&remnants.Any(x=>x.CanClean);Text("ReadyLabel",busy?"●  Đang xử lý":lastState);}
  async Task Work(Func<Task> action){if(busy)return;busy=true;State();var elapsed=System.Diagnostics.Stopwatch.StartNew();var heartbeat=new System.Windows.Threading.DispatcherTimer{Interval=TimeSpan.FromSeconds(1)};heartbeat.Tick+=(s,e)=>Text("ReadyLabel","Đang xử lý · "+elapsed.Elapsed.ToString(@"mm\:ss"));C<ProgressBar>("BusyProgress").Visibility=Visibility.Visible;heartbeat.Start();Text("Status","Đang xử lý…");try{await action();lastState="●  Hoàn tất";}catch(OperationCanceledException){lastState="●  Đã dừng";Text("Status","Đã dừng quét; chưa thay đổi tệp nào.");}catch(Exception ex){Error(ex);}finally{heartbeat.Stop();C<ProgressBar>("BusyProgress").Visibility=Visibility.Collapsed;busy=false;State();}}
  class Owner:System.Windows.Forms.IWin32Window{public IntPtr Handle{get;private set;}public Owner(IntPtr h){Handle=h;}}

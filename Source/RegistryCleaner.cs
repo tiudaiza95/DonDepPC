@@ -161,6 +161,35 @@ public static class RegistryTools {
             }
         } catch { }
 
+        // 5. Quét Phông chữ mồ côi (Orphaned Fonts)
+        try {
+            string fontsDir = Environment.GetFolderPath(Environment.SpecialFolder.Fonts);
+            using (var baseKey = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64))
+            using (var fontsKey = baseKey.OpenSubKey(@"SOFTWARE\Microsoft\Windows NT\CurrentVersion\Fonts")) {
+                if (fontsKey != null) {
+                    foreach (string fontName in fontsKey.GetValueNames()) {
+                        try {
+                            string fontFile = fontsKey.GetValue(fontName) as string;
+                            if (string.IsNullOrWhiteSpace(fontFile)) continue;
+                            string fullFont = Path.IsPathRooted(fontFile) ? fontFile : Path.Combine(fontsDir, fontFile);
+                            if (!File.Exists(fullFont) && !fontFile.Contains("%SystemRoot%")) {
+                                issues.Add(new RegistryIssue {
+                                    Selected = true,
+                                    Category = "Phông chữ mồ côi",
+                                    Hive = RegistryHive.LocalMachine,
+                                    View = RegistryView.Registry64,
+                                    KeyPath = @"SOFTWARE\Microsoft\Windows NT\CurrentVersion\Fonts",
+                                    ValueName = fontName,
+                                    ProblemValue = fontFile,
+                                    Reason = "Tập tin phông chữ không tồn tại: " + fontFile
+                                });
+                            }
+                        } catch {}
+                    }
+                }
+            }
+        } catch {}
+
         return issues;
     }
 

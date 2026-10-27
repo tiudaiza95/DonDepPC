@@ -141,8 +141,28 @@ static class I18n {
   Add("NGUỒN CHÍNH THỨC", "OFFICIAL SOURCE");
   Add("NHÓM", "CLASS");
 
-  // Version 1.0 & About
+  // Version 1.0 & 1.1 & About
   Add("Dọn Dẹp PC Pro Max · Phiên bản 1.0 Chính thức", "DonDepPC Pro Max · Official Version 1.0");
+  Add("Dọn Dẹp PC Pro Max · Phiên bản 1.1 Chính thức", "DonDepPC Pro Max · Official Version 1.1");
+  Add("Tích hợp 4 trong 1: Tàn dư gỡ cài đặt · Tệp dung lượng lớn (>100MB) · Tệp trùng lặp · Lối tắt hỏng", "4-in-1: Leftovers · Large files (>100MB) · Duplicates · Broken shortcuts");
+  Add("🔗 Lối tắt hỏng", "🔗 Broken Shortcuts");
+  Add("Dọn lối tắt đã chọn", "Clean Selected Shortcuts");
+  Add("TÊN LỐI TẮT", "SHORTCUT NAME");
+  Add("VỊ TRÍ", "LOCATION");
+  Add("ĐƯỜNG DẪN HỎNG", "BROKEN TARGET");
+  Add("LÝ DO", "REASON");
+  Add("Ứng dụng Windows Store (UWP)", "Windows Store Apps (UWP)");
+  Add("Ứng dụng máy tính (Win32)", "Desktop Apps (Win32)");
+  Add("📸 Giám sát cài đặt", "📸 Setup Monitor");
+  Add("GIÁM SÁT CÀI ĐẶT MỚI & GỠ BỎ TRIỆT ĐỂ (SETUP MONITOR)", "NEW INSTALLATION MONITOR & COMPLETE UNINSTALL (SETUP MONITOR)");
+  Add("Giám sát cài đặt mới", "Monitor New Installation");
+  Add("Phần mềm đã giám sát", "Monitored Software");
+  Add("TÊN PHẦN MỀM", "SOFTWARE NAME");
+  Add("NGÀY GIÁM SÁT", "DATE MONITORED");
+  Add("SỐ TỆP MỚI", "NEW FILES");
+  Add("SỐ KHÓA REGISTRY", "REGISTRY KEYS");
+  Add("📄 Xuất báo cáo Driver", "📄 Export Driver Report");
+  Add("Phông chữ mồ côi", "Orphaned Fonts");
   Add("Kiểm tra bản cập nhật trên GitHub", "Check for Updates on GitHub");
   Add("Mở Kho mã nguồn GitHub", "Open GitHub Repository");
   Add("Sao chép thông tin phiên bản", "Copy Version Information");

@@ -11,7 +11,8 @@ using System.Windows.Media;
 
 partial class DesktopApp {
  List<DeepItem> deepItems=new List<DeepItem>();
- List<DriverRecord> driverRecords=new List<DriverRecord>();
+ List<DriverRecord> driverRecords=new List<DriverRecord>();
+ List<BrokenShortcut> brokenShortcuts=new List<BrokenShortcut>();
  DataGrid driversGrid;
  TextBlock driverStatus;
 
@@ -128,7 +129,7 @@ partial class DesktopApp {
 
  void BuildDeepPage(){
   Text("Heading",I18n.T("Quét chuyên sâu toàn diện hệ thống"));
-  Text("Subtitle",I18n.T("Tích hợp 3 trong 1: Rác & Tàn dư gỡ cài đặt · Tệp dung lượng lớn (>100MB) · Tệp trùng lặp nội dung (SHA-256)"));
+  Text("Subtitle",I18n.T("Tích hợp 4 trong 1: Tàn dư gỡ cài đặt · Tệp dung lượng lớn (>100MB) · Tệp trùng lặp · Lối tắt hỏng"));
   var dock=new DockPanel();
   proHost.Children.Add(dock);
 
@@ -143,10 +144,12 @@ partial class DesktopApp {
   var btnTabDeep=ActionButton(I18n.T("🛡️ Tàn dư gỡ cài đặt")+" ("+deepItems.Count+")",()=>{});
   var btnTabLarge=ActionButton(I18n.T("📦 Tệp dung lượng lớn")+" ("+files.Count+")",()=>{});
   var btnTabDup=ActionButton(I18n.T("📑 Tệp trùng lặp")+" ("+(duplicateFiles==null?0:duplicateFiles.Count)+")",()=>{});
+  var btnTabShort=ActionButton(I18n.T("🔗 Lối tắt hỏng")+" ("+brokenShortcuts.Count+")",()=>{});
 
   modeRow.Children.Add(btnTabDeep);
   modeRow.Children.Add(btnTabLarge);
   modeRow.Children.Add(btnTabDup);
+  modeRow.Children.Add(btnTabShort);
 
   // 3 Grid tương ứng
   var deepGrid=new DataGrid{IsReadOnly=true,ItemsSource=deepItems};
@@ -168,11 +171,19 @@ partial class DesktopApp {
   AddColumn(dupGrid,"ĐƯỜNG DẪN","Path",520);
   AddColumn(dupGrid,"SHA-256","Evidence",440);
 
+  var shortGrid=new DataGrid{IsReadOnly=true,ItemsSource=brokenShortcuts};
+  AddChecks(shortGrid,"Selected");
+  AddColumn(shortGrid,"TÊN LỐI TẮT","Name",200);
+  AddColumn(shortGrid,"VỊ TRÍ","LocationCategory",180);
+  AddColumn(shortGrid,"ĐƯỜNG DẪN HỎNG","TargetPath",380);
+  AddColumn(shortGrid,"LÝ DO","Reason",260);
+
   var contentHolder=new Grid();
   dock.Children.Add(contentHolder);
   contentHolder.Children.Add(deepGrid);
   contentHolder.Children.Add(largeGrid);
   contentHolder.Children.Add(dupGrid);
+  contentHolder.Children.Add(shortGrid);
 
   var emptyCard=Card(new StackPanel());
   emptyCard.HorizontalAlignment=HorizontalAlignment.Center;
@@ -191,20 +202,24 @@ partial class DesktopApp {
    btnTabDeep.Content=I18n.T("🛡️ Tàn dư gỡ cài đặt")+" ("+deepItems.Count+")";
    btnTabLarge.Content=I18n.T("📦 Tệp dung lượng lớn")+" ("+files.Count+")";
    btnTabDup.Content=I18n.T("📑 Tệp trùng lặp")+" ("+(duplicateFiles==null?0:duplicateFiles.Count)+")";
+   btnTabShort.Content=I18n.T("🔗 Lối tắt hỏng")+" ("+brokenShortcuts.Count+")";
    btnTabDeep.Style=currentTab==0?(Style)window.Resources["Primary"]:(Style)window.FindResource(typeof(Button));
    btnTabLarge.Style=currentTab==1?(Style)window.Resources["Primary"]:(Style)window.FindResource(typeof(Button));
    btnTabDup.Style=currentTab==2?(Style)window.Resources["Primary"]:(Style)window.FindResource(typeof(Button));
-   int curCount=currentTab==0?deepItems.Count:(currentTab==1?files.Count:(duplicateFiles==null?0:duplicateFiles.Count));
+   btnTabShort.Style=currentTab==3?(Style)window.Resources["Primary"]:(Style)window.FindResource(typeof(Button));
+   int curCount=currentTab==0?deepItems.Count:(currentTab==1?files.Count:(currentTab==2?(duplicateFiles==null?0:duplicateFiles.Count):brokenShortcuts.Count));
    emptyCard.Visibility=curCount==0?Visibility.Visible:Visibility.Collapsed;
    deepGrid.Visibility=(currentTab==0&&curCount>0)?Visibility.Visible:Visibility.Collapsed;
    largeGrid.Visibility=(currentTab==1&&curCount>0)?Visibility.Visible:Visibility.Collapsed;
    dupGrid.Visibility=(currentTab==2&&curCount>0)?Visibility.Visible:Visibility.Collapsed;
+   shortGrid.Visibility=(currentTab==3&&curCount>0)?Visibility.Visible:Visibility.Collapsed;
   };
   updateTabUI();
 
   btnTabDeep.Click+=(s,e)=>{currentTab=0;updateTabUI();};
   btnTabLarge.Click+=(s,e)=>{currentTab=1;updateTabUI();};
   btnTabDup.Click+=(s,e)=>{currentTab=2;updateTabUI();};
+  btnTabShort.Click+=(s,e)=>{currentTab=3;updateTabUI();};
 
   // Nút hành động
   var actionRow=new WrapPanel{Margin=new Thickness(0,0,0,10)};
@@ -229,8 +244,12 @@ partial class DesktopApp {
     duplicateFiles=await Task.Run(()=>AnalysisTools.Duplicates(userDir,token,progress,out summary));
     dupGrid.ItemsSource=null;dupGrid.ItemsSource=duplicateFiles;
 
+    Text("Status","Đang quét các lối tắt (.lnk) bị hỏng trên Desktop & Start Menu…");
+    brokenShortcuts=await Task.Run(()=>ShortcutCleaner.Scan());
+    shortGrid.ItemsSource=null;shortGrid.ItemsSource=brokenShortcuts;
+
     updateTabUI();
-    Text("Status","Quét toàn diện hoàn tất: "+deepItems.Count+" tàn dư · "+files.Count+" tệp lớn · "+(duplicateFiles==null?0:duplicateFiles.Count)+" tệp trùng.");
+    Text("Status","Quét toàn diện hoàn tất: "+deepItems.Count+" tàn dư · "+files.Count+" tệp lớn · "+(duplicateFiles==null?0:duplicateFiles.Count)+" tệp trùng · "+brokenShortcuts.Count+" lối tắt hỏng.");
    });
   });
   btnScanAll.Style=(Style)window.Resources["Primary"];
@@ -257,6 +276,20 @@ partial class DesktopApp {
 
   // Nút dọn tệp lớn
   actionRow.Children.Add(WorkButton(I18n.T("Dọn tệp lớn đã chọn"),DeleteLargeFiles));
+
+  // Nút dọn lối tắt hỏng
+  actionRow.Children.Add(WorkButton(I18n.T("Dọn lối tắt đã chọn"),async()=>{ await Task.Yield();
+   var chosen=brokenShortcuts.Where(x=>x.Selected).ToList();
+   if(chosen.Count==0){Text("Status","Chưa chọn lối tắt hỏng.");return;}
+   if(!Confirm("Chuyển "+chosen.Count+" lối tắt hỏng vào Thùng rác để an toàn?"))return;
+   List<string> errors;
+   int cleaned=ShortcutCleaner.Clean(chosen,out errors);
+   foreach(var item in chosen)brokenShortcuts.Remove(item);
+   shortGrid.ItemsSource=null;shortGrid.ItemsSource=brokenShortcuts;
+   updateTabUI();
+   Text("Status","Đã dọn "+cleaned+" lối tắt hỏng; giữ lại "+errors.Count+" mục.");
+   ShowErrors(errors);
+  }));
 
   // Nút dọn tệp trùng
   actionRow.Children.Add(ActionButton(I18n.T("Tự chọn bản trùng dư thừa"),()=>{

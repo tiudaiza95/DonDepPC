@@ -50,6 +50,18 @@ static class ProTests {
   Check(!new JunkItem{File=new FileItem(),Outcome="Đã xử lý"}.CanClean,"processed junk cannot be selected again");
   Check(AnalysisTools.Roots().Any(x=>x.Path.EndsWith("CrashDumps")),"crash reports included in identified cleanup roots");
   Check(!AnalysisTools.Roots().Any(x=>x.Path.IndexOf("SoftwareDistribution",StringComparison.OrdinalIgnoreCase)>=0),"OS update cache not included");
+  Check(UwpManager.GetFriendlyName("Microsoft.WindowsCalculator").Contains("Calculator"),"UWP friendly name mapping");
+  Check(UwpManager.IsProtected("Microsoft.WindowsStore"),"Microsoft Store is protected from accidental uninstall");
+  Check(!UwpManager.IsProtected("Microsoft.WindowsCalculator"),"Calculator is removable Store app");
+  Check(UwpManager.CleanPublisher("CN=OpenAI, O=OpenAI")=="OpenAI","UWP publisher regex extraction");
+  Check(DesktopApp.MatchesFilter(new AppEntry{IsUwp=true},9),"UWP filter matches UWP app");
+  Check(DesktopApp.MatchesFilter(new AppEntry{IsUwp=false},10),"Win32 filter matches Win32 app");
+  var snapTest=new SnapshotRecord{AppName="DonDepPCUnitTestApp",CreatedAt=DateTime.UtcNow};
+  snapTest.CreatedFiles.Add(@"C:\dummy\file.txt");
+  SetupMonitor.SaveRecord(snapTest);
+  var loadedRec=SetupMonitor.LoadAllRecords().FirstOrDefault(r=>r.AppName=="DonDepPCUnitTestApp");
+  Check(loadedRec!=null&&loadedRec.CreatedFiles.Count==1,"SetupMonitor save and load record cycle");
+  if(loadedRec!=null)SetupMonitor.DeleteRecord(loadedRec);
   return count;
  }
 }

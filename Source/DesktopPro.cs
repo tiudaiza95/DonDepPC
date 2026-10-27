@@ -23,9 +23,9 @@ partial class DesktopApp {
  void BuildPro(){
   proHost=new Grid{Visibility=Visibility.Collapsed};((Grid)C<Grid>("AppsPage").Parent).Children.Add(proHost);
   foreach(string n in new[]{"Health","Duplicates","Tools"}){string name=n;C<RadioButton>("Nav"+name).Checked+=(s,e)=>{if(!busy)NavigatePro(name);};}
-  Click("ToggleTheme",()=>SetTheme(!dark));Click("CollapseSidebar",OpenSettingsDialog);C<Button>("CollapseSidebar").MouseRightButtonUp+=(s,e)=>Collapse();Click("AppInfo",()=>ShowInfo(target));Click("ShowGroups",ShowGroups);Click("ForceUninstall",()=>RunDetached(ForceUninstallSelected));Click("BatchUninstall",BatchUninstall);Click("RegistryCleanBtn",OpenRegistryCleanerDialog);Click("ManageServices",OpenServicesDialog);
+  Click("ToggleTheme",()=>SetTheme(!dark));Click("CollapseSidebar",OpenSettingsDialog);C<Button>("CollapseSidebar").MouseRightButtonUp+=(s,e)=>Collapse();Click("AppInfo",()=>ShowInfo(target));Click("ShowGroups",ShowGroups);Click("ForceUninstall",()=>RunDetached(ForceUninstallSelected));Click("BatchUninstall",BatchUninstall);Click("SetupMonitorBtn",OpenSetupMonitorDialog);Click("RegistryCleanBtn",OpenRegistryCleanerDialog);Click("ManageServices",OpenServicesDialog);
   var navStack=(StackPanel)C<RadioButton>("NavApps").Parent;var navDock=(DockPanel)navStack.Parent;navDock.Children.Remove(navStack);navDock.Children.Add(new ScrollViewer{Content=navStack,VerticalScrollBarVisibility=ScrollBarVisibility.Disabled,HorizontalScrollBarVisibility=ScrollBarVisibility.Disabled});
-  var filter=C<ComboBox>("AppFilter");filter.ItemsSource=new[]{"Tất cả ứng dụng","Mới cài · 30 ngày","Dung lượng lớn · ≥ 1 GB","Ít sử dụng · chưa có dữ liệu","Ứng dụng Microsoft / Windows","Ứng dụng bên thứ ba","Hệ thống / driver","Cân nhắc nếu không dùng","Cần thận trọng"};filter.SelectedIndex=0;filter.SelectionChanged+=(s,e)=>Filter();
+  var filter=C<ComboBox>("AppFilter");filter.ItemsSource=new[]{I18n.T("Tất cả ứng dụng"),I18n.T("Mới cài · 30 ngày"),I18n.T("Dung lượng lớn · ≥ 1 GB"),I18n.T("Ít sử dụng · chưa có dữ liệu"),I18n.T("Ứng dụng Microsoft / Windows"),I18n.T("Ứng dụng bên thứ ba"),I18n.T("Hệ thống / driver"),I18n.T("Cân nhắc nếu không dùng"),I18n.T("Cần thận trọng"),I18n.T("Ứng dụng Windows Store (UWP)"),I18n.T("Ứng dụng máy tính (Win32)")};filter.SelectedIndex=0;filter.SelectionChanged+=(s,e)=>Filter();
   var grid=C<DataGrid>("AppsGrid");grid.Columns.Clear();grid.RowHeight=Double.NaN;grid.MinRowHeight=54;grid.FrozenColumnCount=3;
   AddColumn(grid,"STT","Number",40);var iconTemplate=new DataTemplate();var icon=new FrameworkElementFactory(typeof(Image));icon.SetBinding(Image.SourceProperty,new Binding("Icon"));icon.SetValue(Image.WidthProperty,26.0);icon.SetValue(Image.HeightProperty,26.0);iconTemplate.VisualTree=icon;grid.Columns.Add(new DataGridTemplateColumn{Header="",Width=36,CellTemplate=iconTemplate,CanUserSort=false});
   AddColumn(grid,"ỨNG DỤNG","Title",160);AddColumn(grid,"NHÀ PHÁT HÀNH","Vendor",100);AddColumn(grid,"PHIÊN BẢN","Release",90);AddColumn(grid,"DUNG LƯỢNG¹","SizeLabel",90,"InstallBytes");AddColumn(grid,"NGÀY CÀI²","InstalledDate",100);AddColumn(grid,"PHÂN LOẠI","Category",100);AddColumn(grid,"TRẠNG THÁI","StatusLabel",125);
@@ -49,7 +49,7 @@ partial class DesktopApp {
    return;
   }
   var dialog=new Window{
-   Title="Cài đặt & Tiện ích chuyên sâu · Dọn Dẹp PC 1.0",
+   Title="Cài đặt & Tiện ích chuyên sâu · Dọn Dẹp PC 1.1",
    Owner=window,
    Width=800,
    Height=540,
@@ -161,7 +161,7 @@ partial class DesktopApp {
   tab3.Content=t3Panel;
 
   var aboutCard=new StackPanel();
-  aboutCard.Children.Add(Label(I18n.T("Dọn Dẹp PC Pro Max · Phiên bản 1.0 Chính thức"),15,true));
+  aboutCard.Children.Add(Label(I18n.T("Dọn Dẹp PC Pro Max · Phiên bản 1.1 Chính thức"),15,true));
   aboutCard.Children.Add(Label("Mô hình kết hợp hoàn hảo giữa:\n• CCleaner: Dọn tệp tạm, tối ưu RAM, dọn Registry và quản lý tiện ích trình duyệt.\n• IObit Uninstaller: Gỡ cài đặt chuyên sâu, gỡ hàng loạt và dọn sạch tàn dư rác 1-click.\n• Driver & System Tools: Giám sát phần cứng và bảo trì ổ đĩa chuyên sâu.\n\nCam kết an toàn tuyệt đối, minh bạch 100% dữ liệu và bảo vệ quyền riêng tư.",12));
   
   var githubRow=new WrapPanel{Margin=new Thickness(0,10,0,0)};
@@ -180,7 +180,7 @@ partial class DesktopApp {
   Func<AppEntry,IComparable> key=a=>SortValue(a,sort);shown=(descending?shown.OrderByDescending(key):shown.OrderBy(key)).ToList();for(int i=0;i<shown.Count;i++)shown[i].Number=i+1;grid.ItemsSource=shown;foreach(var a in shown.Where(x=>selected.Contains(x.Id)))grid.SelectedItems.Add(a);Text("ListTitle","Ứng dụng · "+shown.Count);if(filter==3)Text("Status","Không thu thập lịch sử sử dụng; chưa có bằng chứng để gắn nhãn ít sử dụng.");
  }
  internal static IComparable SortValue(AppEntry a,string key){if(key=="InstallBytes")return a.EstimatedBytes;if(key=="InstalledDate")return a.InstalledOn??"";if(key=="Number")return a.Number;var prop=typeof(AppEntry).GetProperty(key);return prop==null?(a.Name??""):(IComparable)(prop.GetValue(a,null)??"");}
- internal static bool MatchesFilter(AppEntry a,int filter){switch(filter){case 1:DateTime d;return DateTime.TryParseExact(a.InstalledOn,"yyyyMMdd",System.Globalization.CultureInfo.InvariantCulture,System.Globalization.DateTimeStyles.None,out d)&&d>=DateTime.Today.AddDays(-30)&&d<=DateTime.Today;case 2:return a.EstimatedBytes>=1024L*1024*1024;case 3:return false;case 4:return (a.Publisher??"").IndexOf("Microsoft",StringComparison.OrdinalIgnoreCase)>=0;case 5:return !String.IsNullOrEmpty(a.Publisher)&&(a.Publisher??"").IndexOf("Microsoft",StringComparison.OrdinalIgnoreCase)<0;case 6:return a.SystemComponent||a.Protected;case 7:return a.Advice!=null&&!a.Caution;case 8:return a.Caution;default:return true;}}
+ internal static bool MatchesFilter(AppEntry a,int filter){switch(filter){case 1:DateTime d;return DateTime.TryParseExact(a.InstalledOn,"yyyyMMdd",System.Globalization.CultureInfo.InvariantCulture,System.Globalization.DateTimeStyles.None,out d)&&d>=DateTime.Today.AddDays(-30)&&d<=DateTime.Today;case 2:return a.EstimatedBytes>=1024L*1024*1024;case 3:return false;case 4:return (a.Publisher??"").IndexOf("Microsoft",StringComparison.OrdinalIgnoreCase)>=0;case 5:return !String.IsNullOrEmpty(a.Publisher)&&(a.Publisher??"").IndexOf("Microsoft",StringComparison.OrdinalIgnoreCase)<0;case 6:return a.SystemComponent||a.Protected;case 7:return a.Advice!=null&&!a.Caution;case 8:return a.Caution;case 9:return a.IsUwp;case 10:return !a.IsUwp;default:return true;}}
  void HidePro(){if(proHost==null)return;proHost.Visibility=Visibility.Collapsed;C<FrameworkElement>("GlobalStats").Visibility=Visibility.Collapsed;C<RowDefinition>("StatsRow").Height=new GridLength(0);cleanupSources.Visibility=page=="Temp"?Visibility.Visible:Visibility.Collapsed;}
  void NavigatePro(string name){if(proHost==null)return;page=name;foreach(string panel in new[]{"AppsPage","FilesPage","StartupPage","HistoryPage"})C<FrameworkElement>(panel).Visibility=Visibility.Collapsed;HidePro();proHost.Visibility=Visibility.Visible;proHost.Children.Clear();proControls.RemoveAll(x=>x.Parent==null);if(name=="Health")BuildHealth();if(name=="Duplicates")BuildDuplicatePage();if(name=="Tools")BuildTools();C<RadioButton>("Nav"+name).IsChecked=true;}
  void StatePro(){if(proHost==null)return;foreach(var control in proControls)control.IsEnabled=!busy;foreach(string n in new[]{"AppInfo","ShowGroups","AppFilter","ToggleTheme","CollapseSidebar","NavHealth","NavDuplicates","NavTools"})C<Control>(n).IsEnabled=!busy;cleanupSources.IsEnabled=!busy;StateV05();}
@@ -205,7 +205,13 @@ partial class DesktopApp {
   foreach(var group in apps.GroupBy(x=>Engine.AppNames(x).LastOrDefault()??Engine.Norm(x.Name)).Where(g=>g.Count()>1||g.Any(x=>x.Sources.Count>1))){var item=new TreeViewItem{Header=group.First().Name+" — "+group.Count()+" mục cài đặt, "+group.Sum(x=>x.Sources.Count)+" nguồn đọc",Margin=new Thickness(0,6,0,6)};foreach(var a in group){var child=new TreeViewItem{Header=a.Name+" | "+a.Release+" | "+a.Scope+" | "+a.View+" — "+(a.Sources.Count>1?"cùng mục đọc lặp":"giữ độc lập")};foreach(var source in a.Sources)child.Items.Add(Label(source.Hive+" / "+source.View+"\n"+source.Key+"\nLệnh: "+source.Command+"\nVị trí: "+source.Location,12));item.Items.Add(child);}tree.Items.Add(item);}if(tree.Items.Count==0)tree.Items.Add(new TreeViewItem{Header="Không có nhóm cùng tên hoặc nguồn đọc lặp."});dialog.ShowDialog();}
  async Task UninstallSelected(){var selected=C<DataGrid>("AppsGrid").SelectedItems.Cast<AppEntry>().ToList();if(selected.Count==0&&target!=null)selected.Add(target);if(selected.Count==0)return;if(selected.Any(a=>a.Protected||String.IsNullOrWhiteSpace(a.Command)))throw new Exception("Có mục hệ thống/driver/bảo mật hoặc không có lệnh gỡ. Bỏ chọn mục đó; không ép gỡ.");if(selected.Count>1&&selected.Any(a=>a.Caution))throw new Exception("Nhóm có thành phần cần thận trọng hoặc chưa rõ. Hãy xem thông tin và gỡ từng mục riêng nếu đã xác định được nhu cầu.");
   if(!Confirm("Gỡ "+selected.Count+" ứng dụng sau bằng trình gỡ chính thức?\n\n"+String.Join("\n",selected.Select(x=>x.Name+" · "+x.Release))+"\n\nSao lưu dữ liệu cần giữ. Trình gỡ có thể yêu cầu quyền qua hộp thoại Windows; ứng dụng này không tự nâng quyền."))return;
-  var reports=new List<string>();foreach(var a in selected){target=a;Engine.Remember(a);Text("Status","Đang chờ trình gỡ: "+a.Name);try{var start=Engine.Uninstaller(a);int exit=await Task.Run(()=>{using(var proc=Process.Start(start)){if(proc==null)return -1;proc.WaitForExit();return proc.ExitCode;}});bool present=Engine.Present(a);string result=a.Name+" | exit="+exit+" | "+(present?"Registry vẫn còn: chưa xác nhận gỡ xong":"không còn khóa cài đặt")+(exit==3010?" | yêu cầu khởi động lại":"");reports.Add(result);Engine.Log("UNINSTALL_RESULT "+result);if(present){reports.Add("Dừng chuỗi để tránh chạy song song trình gỡ con. Hoàn tất cửa sổ trình gỡ, rồi làm mới.");break;}}catch(Exception ex){reports.Add(a.Name+": "+ex.Message);Engine.Log("UNINSTALL_ERROR "+a.Name+" | "+ex.Message);break;}}
+  var reports=new List<string>();foreach(var a in selected){target=a;Engine.Remember(a);Text("Status","Đang chờ trình gỡ: "+a.Name);try{if(a.IsUwp){
+    bool ok=UwpManager.RemovePackage(a.PackageFullName);
+    reports.Add(a.Name+" (UWP Store) | "+(ok?"Đã gỡ cài đặt thành công":"Không thể gỡ bỏ"));
+    Engine.Log("UNINSTALL_UWP "+a.Name+" | ok="+ok);
+   }else{
+    var start=Engine.Uninstaller(a);int exit=await Task.Run(()=>{using(var proc=Process.Start(start)){if(proc==null)return -1;proc.WaitForExit();return proc.ExitCode;}});bool present=Engine.Present(a);string result=a.Name+" | exit="+exit+" | "+(present?"Registry vẫn còn: chưa xác nhận gỡ xong":"không còn khóa cài đặt")+(exit==3010?" | yêu cầu khởi động lại":"");reports.Add(result);Engine.Log("UNINSTALL_RESULT "+result);if(present){reports.Add("Dừng chuỗi để tránh chạy song song trình gỡ con. Hoàn tất cửa sổ trình gỡ, rồi làm mới.");break;}
+   }}catch(Exception ex){reports.Add(a.Name+": "+ex.Message);Engine.Log("UNINSTALL_ERROR "+a.Name+" | "+ex.Message);break;}}
   await Reload();if(target!=null&&!Engine.Present(target)){Text("Status","Đang tự động quét phần dư của "+target.Name+"…");try{var found=await Task.Run(()=>Engine.Scan(target));if(found.Count>0){remnants=found;BindRemnants();var cleanable=found.Where(x=>x.CanClean).ToList();long bytes=cleanable.Sum(x=>x.Bytes);if(cleanable.Count>0&&Confirm("ĐÃ GỠ CÀI ĐẶT THÀNH CÔNG!\n\nPhát hiện "+cleanable.Count+" mục phần dư rác còn sót lại ("+Features.Size(bytes)+") của "+target.Name+".\n\nBạn có muốn tự động chọn và dọn dẹp sạch sẽ ngay bây giờ không?")){int done=0;foreach(var item in cleanable){try{Engine.Clean(target,item);remnants.Remove(item);done++;}catch{}}BindRemnants();reports.Add("Tự động dọn phần dư: Đã xóa sạch "+done+" mục ("+Features.Size(bytes)+")!");}}}catch{}}Text("Status","Đã hoàn tất quy trình gỡ cài đặt.");MessageBox.Show(window,String.Join("\n\n",reports),"Kết quả thực tế");
  }
  async Task ScanFilesPro(){bool temp=page=="Temp";string root="";CleanupRoot scope=null;if(temp){scope=cleanupSources.SelectedItem as CleanupRoot;if(scope==null)throw new Exception("Chọn nguồn dọn trước.");root=scope.Path;}else{root=PickFolder("Chọn thư mục để phân tích và tìm tệp lớn. Chỉ đọc dữ liệu.");if(root==null)return;}await WithScan(async token=>{var p=Progress();if(temp){var result=await Task.Run(()=>AnalysisTools.Cleanup(scope,token,p));files=result.Items;Text("FilesSummary",files.Count+" tệp · "+Features.Size(files.Sum(x=>x.Size))+" · bỏ qua "+result.Skipped+(result.Limited?" · giới hạn kết quả":""));}else{int skipped=0;bool limited=false;var all=await Task.Run(()=>AnalysisTools.Walk(root,token,p,out skipped,out limited));diskReport=AnalysisTools.DiskSummary(all);files=all.Where(x=>x.Size>=100L*1024*1024).OrderByDescending(x=>x.Size).Take(500).ToList();Text("FilesSummary",all.Count+" tệp đã đọc · "+Features.Size(all.Sum(x=>x.Size))+" · "+files.Count+" tệp lớn · bỏ qua "+skipped+(limited?" · quét chưa đầy đủ":""));ShowChart(all);}C<DataGrid>("FilesGrid").ItemsSource=files;Text("Status","Quét hoàn tất: "+root+". Chưa thay đổi dữ liệu.");});}
@@ -274,7 +280,7 @@ partial class DesktopApp {
  }
 
  void OpenServicesDialog(){
-  var dialog=new Window{Title="Quản lý Dịch vụ bên thứ ba (Third-party Services) · Dọn Dẹp PC 1.0",Owner=window,Width=920,Height=640,MinWidth=750,MinHeight=480,WindowStartupLocation=WindowStartupLocation.CenterOwner,Resources=window.Resources,FontFamily=window.FontFamily,FontSize=13};
+  var dialog=new Window{Title="Quản lý Dịch vụ bên thứ ba (Third-party Services) · Dọn Dẹp PC 1.1",Owner=window,Width=920,Height=640,MinWidth=750,MinHeight=480,WindowStartupLocation=WindowStartupLocation.CenterOwner,Resources=window.Resources,FontFamily=window.FontFamily,FontSize=13};
   dialog.SetResourceReference(Window.BackgroundProperty,"Canvas");dialog.SetResourceReference(Window.ForegroundProperty,"Ink");
   var root=new DockPanel{Margin=new Thickness(20)};dialog.Content=root;
   var header=new StackPanel{Margin=new Thickness(0,0,0,14)};DockPanel.SetDock(header,Dock.Top);root.Children.Add(header);
@@ -366,7 +372,7 @@ partial class DesktopApp {
    MessageBox.Show(window,"Tất cả các mục bạn chọn đều là thành phần bảo vệ của hệ thống; không thể gỡ bỏ.","Cảnh báo",MessageBoxButton.OK,MessageBoxImage.Warning);
    return;
   }
-  var queueDialog=new Window{Title="⚡ Hàng đợi Gỡ cài đặt hàng loạt (Batch Uninstall) · Dọn Dẹp PC 1.0",Owner=window,Width=780,Height=540,MinWidth=650,MinHeight=420,WindowStartupLocation=WindowStartupLocation.CenterOwner,Resources=window.Resources,FontFamily=window.FontFamily,FontSize=13};
+  var queueDialog=new Window{Title="⚡ Hàng đợi Gỡ cài đặt hàng loạt (Batch Uninstall) · Dọn Dẹp PC 1.1",Owner=window,Width=780,Height=540,MinWidth=650,MinHeight=420,WindowStartupLocation=WindowStartupLocation.CenterOwner,Resources=window.Resources,FontFamily=window.FontFamily,FontSize=13};
   queueDialog.SetResourceReference(Window.BackgroundProperty,"Canvas");queueDialog.SetResourceReference(Window.ForegroundProperty,"Ink");
   var root=new DockPanel{Margin=new Thickness(20)};queueDialog.Content=root;
   var top=new StackPanel{Margin=new Thickness(0,0,0,12)};DockPanel.SetDock(top,Dock.Top);root.Children.Add(top);
@@ -419,8 +425,125 @@ partial class DesktopApp {
   queueDialog.ShowDialog();
  }
 
+
+ void OpenSetupMonitorDialog(){
+  var dialog=new Window{
+   Title="Giám sát & Theo dõi Cài đặt mới (Setup Monitor) · Dọn Dẹp PC 1.1",
+   Owner=window,Width=920,Height=650,MinWidth=750,MinHeight=500,
+   WindowStartupLocation=WindowStartupLocation.CenterOwner,
+   Resources=window.Resources,FontFamily=window.FontFamily,FontSize=13
+  };
+  dialog.SetResourceReference(Window.BackgroundProperty,"Canvas");
+  dialog.SetResourceReference(Window.ForegroundProperty,"Ink");
+  var dock=new DockPanel{Margin=new Thickness(20)};dialog.Content=dock;
+
+  var header=new StackPanel{Margin=new Thickness(0,0,0,14)};DockPanel.SetDock(header,Dock.Top);dock.Children.Add(header);
+  header.Children.Add(Label(I18n.T("GIÁM SÁT CÀI ĐẶT MỚI & GỠ BỎ TRIỆT ĐỂ (SETUP MONITOR)"),19,true));
+  header.Children.Add(Label(I18n.T("Tự động chụp ảnh trạng thái trước & sau khi cài đặt phần mềm. Ghi nhận chính xác 100% mọi tệp tin và khóa Registry mới phát sinh để gỡ bỏ sạch sẽ không còn một tàn dư nào."),12));
+
+  var tabButtons=new WrapPanel{Margin=new Thickness(0,0,0,12)};header.Children.Add(tabButtons);
+  var btnTab1=ActionButton("📸 "+I18n.T("Giám sát cài đặt mới"),null);
+  var btnTab2=ActionButton("📦 "+I18n.T("Phần mềm đã giám sát"),null);
+  tabButtons.Children.Add(btnTab1);tabButtons.Children.Add(btnTab2);
+
+  var contentPanel=new Grid();dock.Children.Add(contentPanel);
+
+  var monitorView=new StackPanel();contentPanel.Children.Add(monitorView);
+  var listView=new DockPanel{Visibility=Visibility.Collapsed};contentPanel.Children.Add(listView);
+
+  SnapshotSession activeSession=null;
+  var card1=new StackPanel();
+  card1.Children.Add(Label("1. BƯỚC 1: BẮT ĐẦU CHỤP ẢNH HỆ THỐNG",14,true));
+  card1.Children.Add(Label("Ghi lại trạng thái thư mục Program Files, AppData và Registry hiện tại trước khi cài đặt. Quá trình diễn ra trong tích tắc.",12));
+  var step1Status=Label("Trạng thái: Chưa bắt đầu",12);step1Status.SetResourceReference(TextBlock.ForegroundProperty,"Muted");
+  var btnStart=ActionButton("▶ Bắt đầu chụp ảnh trước (Start Snapshot)",()=>{
+   step1Status.Text="Đang ghi nhận ảnh hệ thống ban đầu…";
+   activeSession=SetupMonitor.StartSession();
+   step1Status.Text="✓ Đã chụp ảnh xong lúc "+DateTime.Now.ToString("HH:mm:ss")+". Bây giờ bạn hãy chạy file cài đặt phần mềm!";
+   step1Status.SetResourceReference(TextBlock.ForegroundProperty,"Good");
+  });
+  card1.Children.Add(btnStart);card1.Children.Add(step1Status);
+  monitorView.Children.Add(Card(card1));
+
+  var card2=new StackPanel();
+  card2.Children.Add(Label("2. BƯỚC 2: TIẾN HÀNH CÀI ĐẶT PHẦN MỀM",14,true));
+  card2.Children.Add(Label("Hãy mở tệp cài đặt (Setup.exe / Installer.msi) của phần mềm bạn muốn cài đặt và hoàn tất quá trình cài đặt của phần mềm đó như bình thường.",12));
+  monitorView.Children.Add(Card(card2));
+
+  var card3=new StackPanel();
+  card3.Children.Add(Label("3. BƯỚC 3: HOÀN TẤT VÀ TẠO NHẬT KÝ GIÁM SÁT",14,true));
+  card3.Children.Add(Label("Nhập tên phần mềm và bấm nút hoàn tất để hệ thống đối chiếu diff và lưu nhật ký.",12));
+  var txtName=new TextBox{Margin=new Thickness(0,0,0,8),Padding=new Thickness(8,6,8,6),MinWidth=250};
+  txtName.Text="Phần mềm mới";
+  card3.Children.Add(txtName);
+  var step3Status=Label("Chưa tạo nhật ký",12);step3Status.SetResourceReference(TextBlock.ForegroundProperty,"Muted");
+  var btnFinish=ActionButton("✔ Hoàn tất cài đặt & Tạo nhật ký",()=>{
+   if(activeSession==null){MessageBox.Show(dialog,"Vui lòng thực hiện Bước 1 trước khi hoàn tất!","Chưa chụp ảnh");return;}
+   step3Status.Text="Đang đối chiếu thay đổi hệ thống…";
+   var rec=SetupMonitor.CompleteSession(activeSession,txtName.Text);
+   activeSession=null;
+   step3Status.Text="✓ Đã lưu nhật ký giám sát '"+rec.AppName+"': "+rec.CreatedFiles.Count+" tệp và "+rec.CreatedRegistryKeys.Count+" khóa Registry!";
+   step3Status.SetResourceReference(TextBlock.ForegroundProperty,"Good");
+   MessageBox.Show(dialog,"ĐÃ GIÁM SÁT THÀNH CÔNG!\n\nPhần mềm: "+rec.AppName+"\n• Tệp mới tạo: "+rec.CreatedFiles.Count+"\n• Thư mục mới: "+rec.CreatedFolders.Count+"\n• Khóa Registry mới: "+rec.CreatedRegistryKeys.Count+"\n\nNhật ký đã được lưu. Bạn có thể gỡ bỏ triệt để bất cứ lúc nào trong tab 'Phần mềm đã giám sát'!","Hoàn tất",MessageBoxButton.OK,MessageBoxImage.Information);
+  });
+  card3.Children.Add(btnFinish);card3.Children.Add(step3Status);
+  monitorView.Children.Add(Card(card3));
+
+  // Build Tab 2 (List View)
+  var listBottom=new WrapPanel{Margin=new Thickness(0,10,0,0)};DockPanel.SetDock(listBottom,Dock.Bottom);listView.Children.Add(listBottom);
+  var snapGrid=new DataGrid{IsReadOnly=true,AutoGenerateColumns=false,RowHeight=Double.NaN,MinRowHeight=42};
+  listView.Children.Add(snapGrid);
+  AddColumn(snapGrid,"TÊN PHẦN MỀM","AppName",220);
+  AddColumn(snapGrid,"NGÀY GIÁM SÁT","CreatedAt",160);
+
+  List<SnapshotRecord> records=new List<SnapshotRecord>();
+  Action RefreshSnapshots=()=>{
+   records=SetupMonitor.LoadAllRecords();
+   snapGrid.ItemsSource=null;snapGrid.ItemsSource=records;
+  };
+
+  btnTab1.Click+=(s,e)=>{monitorView.Visibility=Visibility.Visible;listView.Visibility=Visibility.Collapsed;};
+  btnTab2.Click+=(s,e)=>{monitorView.Visibility=Visibility.Collapsed;listView.Visibility=Visibility.Visible;RefreshSnapshots();};
+
+  listBottom.Children.Add(ActionButton("🗑️ Gỡ bỏ triệt để 100%",()=>{
+   var rec=snapGrid.SelectedItem as SnapshotRecord;
+   if(rec==null){MessageBox.Show(dialog,"Vui lòng chọn 1 phần mềm trong danh sách để gỡ bỏ!","Thông báo");return;}
+   if(!Confirm("Bạn có chắc chắn muốn gỡ bỏ hoàn toàn '"+rec.AppName+"'?\n\nHệ thống sẽ:\n• Chuyển "+rec.CreatedFiles.Count+" tệp và "+rec.CreatedFolders.Count+" thư mục vào Thùng rác (Recycle Bin)\n• Xóa bỏ "+(rec.CreatedRegistryKeys.Count+rec.CreatedRegistryValues.Count)+" mục Registry đã ghi nhận\n\nToàn bộ tàn dư sẽ được dọn sạch 100%."))return;
+   int fDel,rDel;List<string> errs;
+   SetupMonitor.UninstallMonitoredApp(rec,out fDel,out rDel,out errs);
+   RefreshSnapshots();
+   MessageBox.Show(dialog,"ĐÃ GỠ BỎ TRIỆT ĐỂ!\n\n• Tệp đã dọn: "+fDel+"\n• Mục Registry đã dọn: "+rDel+(errs.Count>0?"\n• Mục cần quyền Administrator: "+errs.Count:""),"Hoàn tất",MessageBoxButton.OK,MessageBoxImage.Information);
+  }));
+
+  listBottom.Children.Add(ActionButton("📄 Xem chi tiết tệp & Registry",()=>{
+   var rec=snapGrid.SelectedItem as SnapshotRecord;
+   if(rec==null){MessageBox.Show(dialog,"Vui lòng chọn 1 phần mềm để xem chi tiết!","Thông báo");return;}
+   var sb=new StringBuilder();
+   sb.AppendLine("CHI TIẾT NHẬT KÝ GIÁM SÁT: "+rec.AppName);
+   sb.AppendLine("Thời gian tạo: "+rec.CreatedAt.ToString("dd/MM/yyyy HH:mm:ss"));
+   sb.AppendLine("\n--- DANH SÁCH THƯ MỤC MỚI ("+rec.CreatedFolders.Count+") ---");
+   foreach(var d in rec.CreatedFolders)sb.AppendLine(d);
+   sb.AppendLine("\n--- DANH SÁCH TỆP MỚI ("+rec.CreatedFiles.Count+") ---");
+   foreach(var f in rec.CreatedFiles)sb.AppendLine(f);
+   sb.AppendLine("\n--- KHÓA REGISTRY MỚI ("+rec.CreatedRegistryKeys.Count+") ---");
+   foreach(var k in rec.CreatedRegistryKeys)sb.AppendLine(k);
+   ShowLongReport("Chi tiết giám sát · "+rec.AppName,sb.ToString());
+  }));
+
+  listBottom.Children.Add(ActionButton("❌ Xóa bản ghi",()=>{
+   var rec=snapGrid.SelectedItem as SnapshotRecord;
+   if(rec==null)return;
+   if(Confirm("Xóa bản ghi nhật ký này khỏi danh sách? (Phần mềm và tệp trên máy tính sẽ không bị xóa)")) {
+    SetupMonitor.DeleteRecord(rec);
+    RefreshSnapshots();
+   }
+  }));
+
+  dialog.ShowDialog();
+ }
+
  void OpenRegistryCleanerDialog(){
-  var dialog=new Window{Title="Dọn dẹp Registry thông minh & An toàn · Dọn Dẹp PC 1.0",Owner=window,Width=960,Height=650,MinWidth=750,MinHeight=480,WindowStartupLocation=WindowStartupLocation.CenterOwner,Resources=window.Resources,FontFamily=window.FontFamily,FontSize=13};
+  var dialog=new Window{Title="Dọn dẹp Registry thông minh & An toàn · Dọn Dẹp PC 1.1",Owner=window,Width=960,Height=650,MinWidth=750,MinHeight=480,WindowStartupLocation=WindowStartupLocation.CenterOwner,Resources=window.Resources,FontFamily=window.FontFamily,FontSize=13};
   dialog.SetResourceReference(Window.BackgroundProperty,"Canvas");dialog.SetResourceReference(Window.ForegroundProperty,"Ink");
   var root=new DockPanel{Margin=new Thickness(20)};dialog.Content=root;
   var header=new StackPanel{Margin=new Thickness(0,0,0,12)};DockPanel.SetDock(header,Dock.Top);root.Children.Add(header);
@@ -470,7 +593,7 @@ partial class DesktopApp {
  }
 
  void OpenBrowserExtensionsDialog(){
-  var dialog=new Window{Title="Quản lý Tiện ích mở rộng Trình duyệt (Browser Extensions) · Dọn Dẹp PC 1.0",Owner=window,Width=920,Height=620,MinWidth=750,MinHeight=460,WindowStartupLocation=WindowStartupLocation.CenterOwner,Resources=window.Resources,FontFamily=window.FontFamily,FontSize=13};
+  var dialog=new Window{Title="Quản lý Tiện ích mở rộng Trình duyệt (Browser Extensions) · Dọn Dẹp PC 1.1",Owner=window,Width=920,Height=620,MinWidth=750,MinHeight=460,WindowStartupLocation=WindowStartupLocation.CenterOwner,Resources=window.Resources,FontFamily=window.FontFamily,FontSize=13};
   dialog.SetResourceReference(Window.BackgroundProperty,"Canvas");dialog.SetResourceReference(Window.ForegroundProperty,"Ink");
   var root=new DockPanel{Margin=new Thickness(20)};dialog.Content=root;
   var header=new StackPanel{Margin=new Thickness(0,0,0,12)};DockPanel.SetDock(header,Dock.Top);root.Children.Add(header);

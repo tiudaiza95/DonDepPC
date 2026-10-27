@@ -1,3 +1,4 @@
+using System.Text;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -7,6 +8,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Threading;
+using System.Windows.Media;
 partial class DesktopApp {
  JunkReport junkReport=new JunkReport();TextBlock junkStatus;DispatcherTimer perfTimer;
  void BuildHealth(){
@@ -96,7 +98,8 @@ partial class DesktopApp {
   var cpuVal=Label("…",28,true);cpuVal.HorizontalAlignment=HorizontalAlignment.Center;cpuVal.Margin=new Thickness(0,4,0,4);
   var cpuBar=new ProgressBar{Height=8,Margin=new Thickness(0,6,0,6),Maximum=100};
   var cpuSub=Label(I18n.T("Đang theo dõi"),12);cpuSub.SetResourceReference(TextBlock.ForegroundProperty,"Muted");cpuSub.HorizontalAlignment=HorizontalAlignment.Center;
-  var cpuBox=new StackPanel();cpuBox.Children.Add(cpuTitle);cpuBox.Children.Add(cpuVal);cpuBox.Children.Add(cpuBar);cpuBox.Children.Add(cpuSub);
+  var cpuWave=new Canvas{Height=32,Margin=new Thickness(0,4,0,4),ClipToBounds=true};
+  var cpuBox=new StackPanel();cpuBox.Children.Add(cpuTitle);cpuBox.Children.Add(cpuVal);cpuBox.Children.Add(cpuBar);cpuBox.Children.Add(cpuWave);cpuBox.Children.Add(cpuSub);
   var cpuCard=Card(cpuBox);cpuCard.Margin=new Thickness(0,0,6,0);cpuCard.Padding=new Thickness(18,16,18,16);Grid.SetColumn(cpuCard,0);perfGrid.Children.Add(cpuCard);
 
   // Ô 2: RAM
@@ -104,7 +107,8 @@ partial class DesktopApp {
   var ramVal=Label("…",28,true);ramVal.HorizontalAlignment=HorizontalAlignment.Center;ramVal.Margin=new Thickness(0,4,0,4);
   var ramBar=new ProgressBar{Height=8,Margin=new Thickness(0,6,0,6),Maximum=100};
   var ramSub=Label(I18n.T("Đang theo dõi"),12);ramSub.SetResourceReference(TextBlock.ForegroundProperty,"Muted");ramSub.HorizontalAlignment=HorizontalAlignment.Center;
-  var ramBox=new StackPanel();ramBox.Children.Add(ramTitle);ramBox.Children.Add(ramVal);ramBox.Children.Add(ramBar);ramBox.Children.Add(ramSub);
+  var ramWave=new Canvas{Height=32,Margin=new Thickness(0,4,0,4),ClipToBounds=true};
+  var ramBox=new StackPanel();ramBox.Children.Add(ramTitle);ramBox.Children.Add(ramVal);ramBox.Children.Add(ramBar);ramBox.Children.Add(ramWave);ramBox.Children.Add(ramSub);
   var ramCard=Card(ramBox);ramCard.Margin=new Thickness(3,0,3,0);ramCard.Padding=new Thickness(18,16,18,16);Grid.SetColumn(ramCard,1);perfGrid.Children.Add(ramCard);
 
   // Ô 3: Ổ C:
@@ -126,6 +130,31 @@ partial class DesktopApp {
   var footBorder=Card(footerCard);
   footBorder.Padding=new Thickness(18,12,18,12);
   mainStack.Children.Add(footBorder);
+
+  var cpuPts=new List<double>();
+  var ramPts=new List<double>();
+  Action<Canvas,List<double>,double,Color,Color> drawWave=(canvas,history,val,strokeCol,fillCol)=>{
+   history.Add(val);
+   if(history.Count>22)history.RemoveAt(0);
+   canvas.Children.Clear();
+   double w=canvas.ActualWidth>20?canvas.ActualWidth:220;
+   double h=32;
+   int count=history.Count;
+   if(count<2)return;
+   var pts=new PointCollection();
+   var area=new PointCollection();
+   area.Add(new Point(0,h));
+   for(int i=0;i<count;i++){
+    double x=i*(w/(count-1));
+    double y=h-(history[i]/100.0*(h-4))-2;
+    if(y<2)y=2;if(y>h-2)y=h-2;
+    var pt=new Point(x,y);
+    pts.Add(pt);area.Add(pt);
+   }
+   area.Add(new Point(w,h));
+   canvas.Children.Add(new System.Windows.Shapes.Polygon{Points=area,Fill=new SolidColorBrush(fillCol)});
+   canvas.Children.Add(new System.Windows.Shapes.Polyline{Points=pts,Stroke=new SolidColorBrush(strokeCol),StrokeThickness=2,StrokeLineJoin=PenLineJoin.Round});
+  };
 
   // Cập nhật real-time metrics
   Action updateM=()=>{
@@ -236,6 +265,43 @@ partial class DesktopApp {
  string JunkSummary(){var remaining=junkReport.Items.Where(x=>x.CanClean).ToList();return remaining.Count+" tệp có thể xem xét · "+Features.Size(remaining.Sum(x=>x.Bytes))+"\nĐã chọn "+remaining.Count(x=>x.Selected)+" tệp · "+Features.Size(remaining.Where(x=>x.Selected).Sum(x=>x.Bytes))+". Phần dư cần xem: "+remaining.Count(x=>!x.Recommended)+" tệp. Quét "+junkReport.Roots+" vị trí rác.";}
  void ShowLongReport(string title,string text){var dialog=new Window{Title=title,Owner=window,Width=850,Height=600,WindowStartupLocation=WindowStartupLocation.CenterOwner,Resources=window.Resources};dialog.SetResourceReference(Window.BackgroundProperty,"Canvas");dialog.Content=new TextBox{Text=text,IsReadOnly=true,TextWrapping=TextWrapping.Wrap,VerticalScrollBarVisibility=ScrollBarVisibility.Auto,Margin=new Thickness(18)};dialog.ShowDialog();}
  async Task VendorActivity(Func<Task> action){var clock=Stopwatch.StartNew();var timer=new DispatcherTimer{Interval=TimeSpan.FromSeconds(1)};string last="";timer.Tick+=(s,e)=>{if(driverStatus.Text!=last)last=driverStatus.Text.Split(new[]{"\nThời gian:"},StringSplitOptions.None)[0];driverStatus.Text=last+"\nThời gian: "+clock.Elapsed.ToString(@"mm\:ss");};timer.Start();try{await action();}catch(Exception ex){driverStatus.Text="Không hoàn tất: "+ex.Message;throw;}finally{timer.Stop();}}
+
+ void ExportDriverList(){
+  try{
+   var drivers=Drivers.Inventory();
+   var sb=new StringBuilder();
+   sb.AppendLine("================================================================================");
+   sb.AppendLine("                     BÁO CÁO TOÀN DIỆN DRIVER & THIẾT BỊ                      ");
+   sb.AppendLine("                   Dọn Dẹp PC Pro Max - Phiên bản 1.1                          ");
+   sb.AppendLine("             Thời gian xuất: "+DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss"));
+   sb.AppendLine("================================================================================");
+   sb.AppendLine();
+   sb.AppendLine("THÔNG TIN HỆ THỐNG:");
+   sb.AppendLine("  Hệ điều hành: "+SystemPerformance.GetOsName());
+   sb.AppendLine("  Bộ vi xử lý:  "+SystemPerformance.GetCpuName());
+   sb.AppendLine("  Bo mạch chủ:  "+VendorDrivers.Board);
+   sb.AppendLine("  Card đồ họa:  "+SystemPerformance.GetGpuName());
+   sb.AppendLine();
+   sb.AppendLine("DANH SÁCH THIẾT BỊ & DRIVER ĐÃ CÀI ĐẶT ("+drivers.Count+" thiết bị):");
+   sb.AppendLine(String.Format("{0,-35} | {1,-30} | {2,-15} | {3,-12} | {4}","TÊN THIẾT BỊ","NHÀ CUNG CẤP","PHIÊN BẢN","NGÀY TẠO","PHÂN LỚP"));
+   sb.AppendLine(new string('-',120));
+   foreach(var d in drivers.OrderBy(x=>x.Class).ThenBy(x=>x.Device)){
+    sb.AppendLine(String.Format("{0,-35} | {1,-30} | {2,-15} | {3,-12} | {4}",
+     (d.Device??"").Length>35?(d.Device??"").Substring(0,32)+"...":(d.Device??""),
+     (d.Vendor??"").Length>30?(d.Vendor??"").Substring(0,27)+"...":(d.Vendor??""),
+     d.Version??"",
+     d.Date??"",
+     d.Class??""));
+   }
+   string desktopPath=Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+   string outFile=Path.Combine(desktopPath,"BaoCao_Driver_"+DateTime.Now.ToString("yyyyMMdd_HHmmss")+".txt");
+   File.WriteAllText(outFile,sb.ToString(),Encoding.UTF8);
+   if(Confirm("ĐÃ XUẤT BÁO CÁO DRIVER THÀNH CÔNG!\n\nFile báo cáo chi tiết "+drivers.Count+" thiết bị đã được lưu tại:\n"+outFile+"\n\nBạn có muốn mở tệp báo cáo xem ngay không?")){
+    Process.Start(new ProcessStartInfo(outFile){UseShellExecute=true});
+   }
+  }catch(Exception ex){Error(ex);}
+ }
+
  void BuildDriverPage(){
   Text("Heading",I18n.T("Driver từ đúng nhà sản xuất."));
   Text("Subtitle",I18n.T("Kiểm kê tại máy — nguồn hãng — cài gói cục bộ có xác minh"));
@@ -283,6 +349,7 @@ partial class DesktopApp {
   }));
 
   actions.Children.Add(ActionButton(I18n.T("Mở Device Manager"),()=>OpenNative("devmgmt.msc")));
+  actions.Children.Add(ActionButton(I18n.T("📄 Xuất báo cáo Driver"),ExportDriverList));
 
   var extra=new WrapPanel();
   extra.Children.Add(WorkButton(I18n.T("Cài gói INF đã tải từ hãng"),async()=>{

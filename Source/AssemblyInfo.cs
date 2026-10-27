@@ -1,6 +1,7 @@
 using System.Reflection;
-[assembly: AssemblyTitle("Dọn Dẹp PC")]
-[assembly: AssemblyDescription("Quản lý ứng dụng và chăm sóc máy tính")]
+using System.Runtime.InteropServices;
+
+[assembly: AssemblyTitle("Dọn Dẹp PC Pro Max")]
 [assembly: AssemblyProduct("Dọn Dẹp PC")]
-[assembly: AssemblyVersion("1.0.0.0")]
-[assembly: AssemblyFileVersion("1.0.0.0")]
+[assembly: AssemblyVersion("1.1.0.0")]
+[assembly: AssemblyFileVersion("1.1.0.0")]
