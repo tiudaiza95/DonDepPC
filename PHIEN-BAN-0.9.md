@@ -3,7 +3,7 @@
 > **Phiên bản**: `0.9.0.0`  
 > **Kiến trúc**: 64-bit Native (.NET 4.8 / WPF)  
 > **Trạng thái kiểm thử**: PASS 96/96 Unit Checks  
-> **Mã băm SHA-256**: `EE77517B9F80279386F9C3497EB5A3B40BF52F89C0553956FCA5153442204847`  
+> **Mã băm SHA-256**: `A0DD023B0CA9315EECF253DA9867E8638E23FFFF857BFAE7B1569DC10A6C9002`  
 > **Lối tắt Desktop**: `C:\Users\Admin\Desktop\Dọn Dẹp PC.lnk` trỏ trực tiếp đến `C:\Users\Admin\AppData\Local\Programs\DonDepPC\DonDepPC.exe`
 
 ---
@@ -13,6 +13,7 @@
 ### 🌐 1. Bổ sung hỗ trợ Đa ngôn ngữ (Tiếng Anh & Tiếng Việt)
 - Tích hợp động cơ dịch thuật `I18n` hỗ trợ chuyển đổi linh hoạt giữa **Tiếng Việt** và **English (US)**.
 - Người dùng có thể dễ dàng chuyển đổi ngôn ngữ trong menu Cài đặt (`☰` > Cài đặt & An toàn > Giao diện & Ngôn ngữ). Khi chọn, toàn bộ Sidebar, tiêu đề, nút bấm, thẻ đo và thông số sẽ chuyển sang tiếng Anh tức thì và lưu cấu hình cho các lần khởi động tiếp theo.
+- Khởi tạo an toàn (Fail-safe Initializer): Cơ chế nạp từ điển chống trùng lặp tuyệt đối, có bọc khối ngoại lệ an toàn, đảm bảo khởi động ứng dụng trơn tru không bao giờ bị lỗi type initializer.
 
 ### 📐 2. Tiêu đề căn giữa chuẩn mực & Tối giản thẻ Dọn dẹp
 - **Căn giữa toàn bộ tiêu đề trang**: Tiêu đề chính (*"Tổng quan hệ thống & Giám sát hiệu năng"*) và phụ đề của tất cả các trang đều được căn giữa (`HorizontalAlignment="Center"`, `TextAlignment="Center"`), mang lại vẻ ngoài trang nhã, hiện đại.
@@ -35,5 +36,4 @@
 
 ## 2. Kết quả nghiệm thu kỹ thuật
 - **Unit Tests**: `PASS: 96 checks` (Kiểm thử bộ nhớ, dọn rác, registry, driver, startup).
-- **GUI Launch**: Không phát sinh bất kỳ biệt lệ hay lỗi giao diện nào.
-- **Chuyển đổi Ngôn ngữ**: Đã kiểm thử chuyển đổi qua lại giữa EN và VI thành công, ổn định 100%.
+- **GUI Launch**: Đã kiểm thử khởi chạy thực tế cả 2 chế độ ngôn ngữ Tiếng Việt và Tiếng Anh đều hoàn hảo 100%.
